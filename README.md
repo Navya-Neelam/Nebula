@@ -1,6 +1,8 @@
 # Nebula Auth
 
-A beautifully designed full-stack Login and Registration system themed around a glowing "Nebula" dark/aurora interface.
+A production-style authentication system built using Java Spring Boot and Angular. The application provides secure user registration, login, JWT-based authentication, password encryption using BCrypt, and MongoDB integration with a modern Angular frontend.
+
+This project demonstrates backend development skills including REST APIs, Spring Security, JWT, MongoDB, and frontend integration.
 
 ## Tech Stack
 
@@ -10,6 +12,21 @@ A beautifully designed full-stack Login and Registration system themed around a 
 - **Authentication**: JWT-based, passwords hashed with BCrypt
 
 ---
+## Architecture 
+
+Angular Client
+      │
+      ▼
+REST APIs
+      │
+      ▼
+Spring Boot
+      │
+Spring Security
+      │
+JWT Authentication
+      │
+MongoDB
 
 ## Project Structure
 
