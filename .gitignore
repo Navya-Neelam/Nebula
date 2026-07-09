@@ -1,0 +1,35 @@
+# Maven / Java
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.db
+
+# Node / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+.npm/
+
+# IDE / Editor config
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Secrets / Configuration
+.env
+.env.local
+.env.*.local
+application-local.properties
+application-local.yml
+application-local.yaml
+*.log
+
+# System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

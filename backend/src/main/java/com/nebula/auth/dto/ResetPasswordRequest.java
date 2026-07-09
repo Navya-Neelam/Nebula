@@ -1,0 +1,56 @@
+package com.nebula.auth.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+public class ResetPasswordRequest {
+    @NotBlank(message = "Email is required")
+    private String email;
+
+    @NotBlank(message = "OTP is required")
+    @Pattern(regexp = "\\d{4}", message = "OTP must contain exactly 4 digits")
+    private String otp;
+
+    @NotBlank(message = "New password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$", message = "Password must contain uppercase, lowercase, number, and special character")
+    private String newPassword;
+
+    @NotBlank(message = "Confirm password is required")
+    private String confirmPassword;
+
+    public ResetPasswordRequest() {}
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+}

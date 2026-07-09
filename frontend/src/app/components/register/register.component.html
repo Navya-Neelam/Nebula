@@ -1,0 +1,160 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple"></div>
+  <div class="nebula-blob blob-teal"></div>
+  <div class="nebula-blob blob-pink"></div>
+</div>
+
+<div class="route-wrapper">
+  <div class="glass-card animate-fade-in">
+    <div style="text-align: center; margin-bottom: 28px;">
+      <h2 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #14b8a6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">Create Account</h2>
+      <p style="color: var(--text-secondary); font-size: 15px;">Join us and start securing your dashboard.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; text-align: center;">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Full Name Field -->
+      <div class="form-group">
+        <label for="fullName" class="form-label">Full Name</label>
+        <div class="input-container">
+          <input 
+            type="text" 
+            id="fullName" 
+            formControlName="fullName" 
+            class="form-input" 
+            [class.is-invalid]="isFieldInvalid('fullName')"
+            placeholder="John Doe"
+          />
+        </div>
+        @if (isFieldInvalid('fullName')) {
+          <span class="field-error">
+            Full name is required
+          </span>
+        }
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="input-container">
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            class="form-input" 
+            [class.is-invalid]="isFieldInvalid('email')"
+            placeholder="name@example.com"
+          />
+        </div>
+        @if (isFieldInvalid('email')) {
+          <span class="field-error">
+            @if (registerForm.get('email')?.errors?.['required']) {
+              Email is required
+            } @else if (registerForm.get('email')?.errors?.['email']) {
+              Please enter a valid email address
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-container">
+          <input 
+            [type]="showPassword() ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password" 
+            class="form-input" 
+            [class.is-invalid]="isFieldInvalid('password')"
+            placeholder="••••••••"
+          />
+          <button type="button" class="password-toggle-btn" (click)="togglePassword()" aria-label="Toggle password visibility">
+            @if (showPassword()) {
+              <!-- Eye Off SVG Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
+              </svg>
+            } @else {
+              <!-- Eye SVG Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (isFieldInvalid('password')) {
+          <span class="field-error">
+            @if (registerForm.get('password')?.errors?.['required']) {
+              Password is required
+            } @else if (registerForm.get('password')?.errors?.['minlength']) {
+              Password must be at least 8 characters long
+            } @else if (registerForm.get('password')?.errors?.['pattern']) {
+              Password must contain at least one number
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <div class="input-container">
+          <input 
+            [type]="showConfirmPassword() ? 'text' : 'password'" 
+            id="confirmPassword" 
+            formControlName="confirmPassword" 
+            class="form-input" 
+            [class.is-invalid]="isFieldInvalid('confirmPassword')"
+            placeholder="••••••••"
+          />
+          <button type="button" class="password-toggle-btn" (click)="toggleConfirmPassword()" aria-label="Toggle confirm password visibility">
+            @if (showConfirmPassword()) {
+              <!-- Eye Off SVG Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
+              </svg>
+            } @else {
+              <!-- Eye SVG Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (isFieldInvalid('confirmPassword')) {
+          <span class="field-error">
+            @if (registerForm.get('confirmPassword')?.errors?.['required']) {
+              Please confirm your password
+            } @else if (registerForm.get('confirmPassword')?.errors?.['passwordMismatch']) {
+              Passwords do not match
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading() || registerForm.invalid">
+        @if (isLoading()) {
+          <div class="spinner"></div>
+          Creating Account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <!-- Footer Links -->
+    <div class="auth-footer">
+      Already have an account? 
+      <a routerLink="/login" class="auth-link">Sign In</a>
+    </div>
+  </div>
+</div>

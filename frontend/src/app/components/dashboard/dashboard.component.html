@@ -1,0 +1,873 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple" style="top: -200px; left: -200px; width: 600px; height: 600px;"></div>
+  <div class="nebula-blob blob-teal" style="bottom: -200px; right: -200px; width: 700px; height: 700px;"></div>
+  <div class="nebula-blob blob-pink" style="top: 30%; left: 40%; width: 500px; height: 500px; opacity: 0.3;"></div>
+</div>
+
+<style>
+  .dashboard-layout {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: rgba(17, 24, 39, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 40px;
+  }
+
+  .logo-brand {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .user-welcome-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .welcome-text {
+    font-size: 15px;
+    color: var(--text-primary);
+  }
+
+  .welcome-text strong {
+    color: var(--accent-teal);
+  }
+
+  .logout-btn {
+    background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-purple) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .logout-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  @media (min-width: 992px) {
+    .main-grid {
+      grid-template-columns: 350px 1fr;
+    }
+  }
+
+  .hero-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+  }
+
+  .hero-tag {
+    color: var(--accent-teal);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .hero-title {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #d1d5db 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .category-filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .category-item-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .category-item-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .category-item-btn.active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.3);
+    color: var(--text-primary);
+    font-weight: 500;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.1) inset;
+  }
+
+  .category-count {
+    font-size: 11px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .category-item-btn.active .category-count {
+    background: var(--accent-purple);
+    color: white;
+  }
+
+  .carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carousel-deck {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 576px) {
+    .carousel-deck {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .carousel-deck {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .course-card-premium {
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .course-card-premium:hover {
+    transform: translateY(-6px);
+    border-color: rgba(168, 85, 247, 0.25);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+                0 0 20px 2px rgba(168, 85, 247, 0.15);
+  }
+
+  .card-img-container {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    background: #111827;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .course-card-premium:hover .card-img {
+    transform: scale(1.08);
+  }
+
+  .card-img-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    font-family: var(--font-heading);
+    position: relative;
+  }
+
+  .fallback-icon-wrapper {
+    margin-bottom: 8px;
+    opacity: 0.85;
+  }
+
+  .fallback-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 90%;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .gradient-ai { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+  .gradient-ds { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+  .gradient-web { background: linear-gradient(135deg, #10b981, #14b8a6); }
+  .gradient-cloud { background: linear-gradient(135deg, #2563eb, #06b6d4); }
+  .gradient-sec { background: linear-gradient(135deg, #111827, #ef4444); }
+  .gradient-mob { background: linear-gradient(135deg, #f97316, #eab308); }
+  .gradient-mkt { background: linear-gradient(135deg, #f43f5e, #6d28d9); }
+
+  .card-category-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(5, 8, 22, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent-teal);
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-instructor {
+    font-size: 12px;
+    color: var(--accent-purple);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 46px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 38px;
+  }
+
+  .card-footer-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 14px;
+  }
+
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .rating-badge {
+    color: #f59e0b;
+    font-weight: 600;
+  }
+
+  .card-arrow-action {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .course-card-premium:hover .card-arrow-action {
+    background: white;
+    color: var(--bg-color);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transform: translateX(2px);
+  }
+
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 12px;
+  }
+
+  .ctrl-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(17, 24, 39, 0.5);
+    backdrop-filter: blur(8px);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ctrl-btn:hover:not(:disabled) {
+    background: var(--accent-purple);
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    transform: scale(1.05);
+  }
+
+  .ctrl-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .pagination-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .dot.active {
+    width: 24px;
+    border-radius: 10px;
+    background: var(--accent-teal);
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+  }
+
+  /* Overlay Glass Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 8, 22, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modal-bg-fade 0.25s ease-out;
+  }
+
+  .modal-card {
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    position: relative;
+    animation: modal-scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modal-bg-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modal-scale-up {
+    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+  }
+
+  .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: rotate(90deg);
+  }
+
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  @media (min-width: 768px) {
+    .modal-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .modal-img-container {
+    height: 300px;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #111827;
+  }
+
+  @media (min-width: 768px) {
+    .modal-img-container {
+      height: 100%;
+      min-height: 380px;
+    }
+  }
+
+  .modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .modal-details {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .modal-category-pill {
+    background: rgba(20, 184, 166, 0.15);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    color: var(--accent-teal);
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    width: fit-content;
+    margin-bottom: 12px;
+  }
+
+  .modal-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .modal-instructor {
+    font-size: 14px;
+    color: var(--accent-purple);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .modal-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 12px 18px;
+    border-radius: 12px;
+  }
+
+  .modal-stat-box {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .modal-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .modal-enroll-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(20, 184, 166, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .modal-enroll-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+</style>
+
+<div class="dashboard-layout">
+  <!-- Top Navigation Header -->
+  <header class="header-nav">
+    <div class="logo-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Nebula Academy
+    </div>
+    
+    <div class="user-welcome-info">
+      @if (authService.currentUser(); as user) {
+        <span class="welcome-text">Welcome back, <strong>{{ user.fullName }}</strong>!</span>
+      }
+      <button (click)="logout()" class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <!-- Main Grid Section -->
+  <main class="main-grid">
+    
+    <!-- Left Hero & Sidebar Filter -->
+    <section class="hero-panel">
+      <span class="hero-tag">Learn & Expand</span>
+      <h1 class="hero-title">Learn essential career and life skills</h1>
+      <p class="hero-desc">
+        Nebula Academy helps you build in-demand skills fast and advance your career in a changing digital job market. Pick a category and explore our courses below.
+      </p>
+
+      <!-- Category Filter Panel -->
+      <div class="category-filter-list">
+        @for (category of categories; track category) {
+          <button 
+            (click)="selectCategory(category)"
+            class="category-item-btn"
+            [class.active]="selectedCategory() === category">
+            {{ category }}
+            <span class="category-count">
+              {{ category === 'All' ? courses().length : courses().filter(c => c.category === category).length }}
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Right Carousel Panel -->
+    <section class="carousel-wrapper">
+      
+      @if (isLoading()) {
+        <!-- Loading State -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px;">
+          <div class="spinner" style="margin-bottom: 16px; width: 44px; height: 44px; border-width: 4px; border-top-color: var(--accent-purple);"></div>
+          <p style="color: var(--text-secondary); font-size: 15px;">Loading available courses...</p>
+        </div>
+      } @else {
+        
+        @if (visibleCourses().length === 0) {
+          <!-- Empty State -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 40px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" style="margin-bottom: 16px;">
+              <circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>
+            </svg>
+            <p style="color: var(--text-secondary); font-size: 16px; font-weight: 500;">No courses found in this category.</p>
+          </div>
+        } @else {
+          
+          <!-- Cards Carousel Deck -->
+          <div class="carousel-deck">
+            @for (course of visibleCourses(); track course.id) {
+              <div class="course-card-premium" (click)="openCourseDetails(course)">
+                <div class="card-img-container">
+                  @if (course.imageUrl && !imageErrors()[course.title]) {
+                    <img [src]="course.imageUrl" [alt]="course.title" class="card-img" (error)="onImageError(course.title)" />
+                  } @else {
+                    <div class="card-img-fallback" [ngClass]="getCategoryClass(course.category)">
+                      <div class="fallback-icon-wrapper">
+                        @if (course.category === 'Generative AI') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        } @else if (course.category === 'Data Science') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        } @else if (course.category === 'Web Development') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+                        } @else if (course.category === 'Cloud Computing') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                        } @else if (course.category === 'Cybersecurity') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        } @else if (course.category === 'Mobile Development') {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        } @else {
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 17L12 22L22 17"/><path d="M2 12L12 17L22 12"/></svg>
+                        }
+                      </div>
+                      <span class="fallback-title">{{ course.title }}</span>
+                    </div>
+                  }
+                  <span class="card-category-badge">{{ course.category }}</span>
+                </div>
+                
+                <div class="card-body">
+                  <span class="card-instructor">Instructor: {{ course.instructor }}</span>
+                  <h3 class="card-title">{{ course.title }}</h3>
+                  <p class="card-desc">{{ course.description }}</p>
+                  
+                  <div class="card-footer-info">
+                    <div class="card-stats">
+                      <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        {{ course.duration }}
+                      </div>
+                      <div class="stat-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span class="rating-badge">{{ course.rating | number:'1.1-1' }}</span>
+                      </div>
+                    </div>
+                    
+                    <button class="card-arrow-action">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Carousel Controls (Dots & Arrows) -->
+          <div class="carousel-controls">
+            <!-- Left Arrow -->
+            <button 
+              (click)="prevPage()" 
+              [disabled]="totalPages() <= 1"
+              class="ctrl-btn" 
+              aria-label="Previous Page">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+
+            <!-- Navigation Dots -->
+            <div class="pagination-dots">
+              @for (pageIdx of totalPagesArray(); track pageIdx) {
+                <span 
+                  (click)="setPage(pageIdx)" 
+                  class="dot" 
+                  [class.active]="currentPage() === pageIdx">
+                </span>
+              }
+            </div>
+
+            <!-- Right Arrow -->
+            <button 
+              (click)="nextPage()" 
+              [disabled]="totalPages() <= 1"
+              class="ctrl-btn" 
+              aria-label="Next Page">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        }
+      }
+    </section>
+  </main>
+</div>
+
+<!-- Detailed Modal View Overlay -->
+@if (selectedCourse(); as selected) {
+  <div class="modal-overlay" (click)="closeCourseDetails()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeCourseDetails()" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="modal-grid">
+        <!-- Modal Left Side (Image) -->
+        <div class="modal-img-container">
+          @if (selected.imageUrl && !imageErrors()[selected.title]) {
+            <img [src]="selected.imageUrl" [alt]="selected.title" class="modal-img" (error)="onImageError(selected.title)" />
+          } @else {
+            <div class="card-img-fallback" [ngClass]="getCategoryClass(selected.category)" style="height: 100%;">
+              <div class="fallback-icon-wrapper" style="margin-bottom: 12px;">
+                @if (selected.category === 'Generative AI') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                } @else if (selected.category === 'Data Science') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                } @else if (selected.category === 'Web Development') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+                } @else if (selected.category === 'Cloud Computing') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                } @else if (selected.category === 'Cybersecurity') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                } @else if (selected.category === 'Mobile Development') {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                } @else {
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 17L12 22L22 17"/><path d="M2 12L12 17L22 12"/></svg>
+                }
+              </div>
+              <span class="fallback-title" style="font-size: 16px;">{{ selected.title }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Modal Right Side (Info details) -->
+        <div class="modal-details">
+          <span class="modal-category-pill">{{ selected.category }}</span>
+          <h2 class="modal-title">{{ selected.title }}</h2>
+          <span class="modal-instructor">With Instructor {{ selected.instructor }}</span>
+          
+          <div class="modal-stats">
+            <div class="modal-stat-box">
+              <span class="stat-label">Duration</span>
+              <span class="stat-value">{{ selected.duration }}</span>
+            </div>
+            <div class="modal-stat-box" style="border-left: 1px solid rgba(255,255,255,0.08); padding-left: 20px;">
+              <span class="stat-label">Rating</span>
+              <span class="stat-value" style="color: #f59e0b;">{{ selected.rating | number:'1.1-1' }} ★</span>
+            </div>
+          </div>
+
+          <p class="modal-desc">
+            {{ selected.detailDescription }}
+          </p>
+
+          <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <button class="modal-enroll-btn" (click)="buyCourse(selected)" style="flex: 1; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-pink) 100%); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35);">Buy Course</button>
+            <button class="modal-enroll-btn" (click)="addToCart(selected)" style="flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: white; box-shadow: none;">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Toast Notification -->
+@if (toastMessage(); as message) {
+  <div style="position: fixed; bottom: 24px; right: 24px; background: rgba(17, 24, 39, 0.9); border: 1px solid var(--accent-teal); color: #5eead4; padding: 16px 24px; border-radius: 12px; backdrop-filter: blur(12px); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(20, 184, 166, 0.25); display: flex; align-items: center; gap: 10px; animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    <span style="font-weight: 500; font-size: 14px;">{{ message }}</span>
+  </div>
+}
