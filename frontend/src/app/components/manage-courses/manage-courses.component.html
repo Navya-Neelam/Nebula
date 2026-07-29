@@ -1,0 +1,475 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple" style="top: -200px; left: -200px; width: 600px; height: 600px;"></div>
+  <div class="nebula-blob blob-teal" style="bottom: -200px; right: -200px; width: 700px; height: 700px;"></div>
+</div>
+
+<style>
+  .manage-layout {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: rgba(17, 24, 39, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 40px;
+  }
+
+  .logo-brand {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .back-dashboard-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .back-dashboard-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .add-course-btn {
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .add-course-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(20, 184, 166, 0.45);
+  }
+
+  /* Grid and Cards */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 576px) {
+    .courses-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .courses-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .course-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .course-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(168, 85, 247, 0.25);
+  }
+
+  .card-img-container {
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+    background: #111827;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-category-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(5, 8, 22, 0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent-teal);
+    padding: 3px 10px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .card-status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 3px 10px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-published {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+  }
+
+  .badge-draft {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    height: 42px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    height: 36px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+  }
+
+  .price-tag {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  /* Modal Dialog */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 8, 22, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-card {
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 576px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Toast */
+  .toast-box {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid var(--accent-purple);
+    border-radius: 12px;
+    padding: 14px 20px;
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(168,85,247,0.25);
+    z-index: 200;
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+</style>
+
+<div class="manage-layout">
+  
+  <!-- Navigation Header -->
+  <header class="header-nav animate-fade-in">
+    <a routerLink="/dashboard" class="logo-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Nebula Academy
+    </a>
+    
+    <div style="display: flex; gap: 12px;">
+      <button (click)="openAddModal()" class="add-course-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="16" height="16">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Add Course
+      </button>
+      <a routerLink="/dashboard" class="back-dashboard-btn">Back</a>
+    </div>
+  </header>
+
+  <!-- Title section -->
+  <div style="margin-bottom: 30px;" class="animate-fade-in">
+    <h1 style="font-size: 32px; font-weight: 700; color: white; margin-bottom: 8px;">Course Management</h1>
+    <p style="color: var(--text-secondary); font-size: 15px;">Create new learning programs, update curriculum, and set course configurations.</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px;" class="animate-fade-in">
+      <div class="spinner" style="width: 40px; height: 40px; border-width: 4px; border-top-color: var(--accent-purple); margin-bottom: 16px;"></div>
+      <p style="color: var(--text-secondary); font-size: 14px;">Loading course repository...</p>
+    </div>
+  } @else {
+    
+    @if (courses().length === 0) {
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; border: 1px dashed var(--card-border); border-radius: 20px; padding: 40px; text-align: center;" class="animate-fade-in">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="var(--text-secondary)" width="48" height="48" style="margin-bottom: 16px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+        </svg>
+        <h3 style="color: white; font-size: 18px; margin-bottom: 6px;">No Courses Registered</h3>
+        <p style="color: var(--text-secondary); font-size: 14px; max-width: 400px; margin-bottom: 20px;">You haven't created any courses yet. Get started by clicking the "Add Course" button above.</p>
+        <button (click)="openAddModal()" class="add-course-btn" style="box-shadow: none;">Create First Course</button>
+      </div>
+    } @else {
+      <!-- Course Grid -->
+      <div class="courses-grid animate-fade-in">
+        @for (course of courses(); track course.id) {
+          <div class="course-card">
+            <div class="card-img-container">
+              <img [src]="course.thumbnail || course.imageUrl" alt="Thumbnail" class="card-img" />
+              <span class="card-category-badge">{{ course.category }}</span>
+              <span class="card-status-badge" [class.badge-published]="course.status === 'PUBLISHED'" [class.badge-draft]="course.status === 'DRAFT'">
+                {{ course.status || 'PUBLISHED' }}
+              </span>
+            </div>
+            
+            <div class="card-body">
+              <h3 class="card-title">{{ course.title }}</h3>
+              <p class="card-desc">{{ course.description }}</p>
+              
+              <div class="card-footer-info">
+                <span class="price-tag">${{ course.price | number:'1.2-2' }}</span>
+                
+                <div style="display: flex; gap: 8px;">
+                  <button (click)="openEditModal(course)" class="action-btn status-toggle-btn">
+                    Edit
+                  </button>
+                  <button (click)="deleteCourse(course)" class="action-btn delete-btn">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  }
+
+</div>
+
+<!-- Add/Edit Course Modal Dialog -->
+@if (showCourseModal()) {
+  <div class="modal-overlay">
+    <div class="modal-card animate-fade-in">
+      <h3 style="color: white; font-size: 22px; font-weight: 700; margin-bottom: 24px;">
+        {{ isEditMode() ? 'Edit Course Settings' : 'Create New Course' }}
+      </h3>
+
+      <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+        <!-- Title -->
+        <div class="form-group">
+          <label class="form-label">Course Title</label>
+          <input formControlName="title" class="form-input" [class.is-invalid]="isFieldInvalid('title')" placeholder="e.g. Introduction to Generative AI" />
+          @if (isFieldInvalid('title')) {
+            <span class="field-error">Course title is required (max 100 characters)</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select formControlName="category" class="form-input" style="background: var(--input-bg); color: white;">
+              @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <label class="form-label">Price ($ USD)</label>
+            <input type="number" step="0.01" formControlName="price" class="form-input" [class.is-invalid]="isFieldInvalid('price')" placeholder="49.99" />
+            @if (isFieldInvalid('price')) {
+              <span class="field-error">Please enter a valid price (minimum $0)</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Duration -->
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <input formControlName="duration" class="form-input" [class.is-invalid]="isFieldInvalid('duration')" placeholder="e.g. 12 hours" />
+            @if (isFieldInvalid('duration')) {
+              <span class="field-error">Must match duration format (e.g. "12 hours", "45 mins")</span>
+            }
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label class="form-label">Publishing Status</label>
+            <select formControlName="status" class="form-input" style="background: var(--input-bg); color: white;">
+              <option value="PUBLISHED">PUBLISHED</option>
+              <option value="DRAFT">DRAFT</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Thumbnail URL -->
+        <div class="form-group">
+          <label class="form-label">Thumbnail URL</label>
+          <input formControlName="thumbnail" class="form-input" [class.is-invalid]="isFieldInvalid('thumbnail')" placeholder="https://images.unsplash.com/..." />
+          @if (isFieldInvalid('thumbnail')) {
+            <span class="field-error">Thumbnail image URL is required</span>
+          }
+        </div>
+
+        <!-- Short Description -->
+        <div class="form-group">
+          <label class="form-label">Short Summary Description</label>
+          <input formControlName="description" class="form-input" [class.is-invalid]="isFieldInvalid('description')" placeholder="Brief course hook summary..." />
+          @if (isFieldInvalid('description')) {
+            <span class="field-error">Short description is required (max 300 characters)</span>
+          }
+        </div>
+
+        <!-- Detail Description -->
+        <div class="form-group">
+          <label class="form-label">Detailed Course Syllabus / Description</label>
+          <textarea formControlName="detailDescription" class="form-input" style="height: 140px; resize: vertical;" [class.is-invalid]="isFieldInvalid('detailDescription')" placeholder="Complete course syllabus, prerequisites, and learning outcomes..."></textarea>
+          @if (isFieldInvalid('detailDescription')) {
+            <span class="field-error">Detailed description is required (max 2000 characters)</span>
+          }
+        </div>
+
+        <!-- Modal Actions -->
+        <div style="display: flex; gap: 12px; margin-top: 30px;">
+          <button type="button" (click)="showCourseModal.set(false)" class="back-dashboard-btn" style="flex: 1; text-align: center; border-radius: 12px; padding: 12px;">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" style="flex: 1; box-shadow: none;" [disabled]="isSubmitting() || courseForm.invalid">
+            @if (isSubmitting()) {
+              <div class="spinner"></div>
+            } @else {
+              {{ isEditMode() ? 'Save' : 'Create' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Toast Feedback -->
+@if (toastMessage()) {
+  <div class="toast-box">
+    {{ toastMessage() }}
+  </div>
+}

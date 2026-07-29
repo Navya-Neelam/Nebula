@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './guards/auth.guard';
+import { authGuard, guestGuard, roleGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -18,6 +18,11 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
+    path: 'verify',
+    loadComponent: () => import('./components/verify-email/verify-email.component').then(m => m.VerifyEmailComponent),
+    canActivate: [guestGuard]
+  },
+  {
     path: 'reset-password',
     loadComponent: () => import('./components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
     canActivate: [guestGuard]
@@ -31,6 +36,23 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./components/admin-users/admin-users.component').then(m => m.AdminUsersComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'manage-courses',
+    loadComponent: () => import('./components/manage-courses/manage-courses.component').then(m => m.ManageCoursesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'INSTRUCTOR'] }
   },
   {
     path: '',

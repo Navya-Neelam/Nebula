@@ -41,6 +41,7 @@ export class RegisterComponent {
   showPassword = signal(false);
   showConfirmPassword = signal(false);
   isLoading = signal(false);
+  isRegistered = signal(false);
   errorMessage = signal<string | null>(null);
 
   togglePassword() {
@@ -59,13 +60,15 @@ export class RegisterComponent {
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.isRegistered.set(false);
 
     const { fullName, email, password } = this.registerForm.value;
 
     this.authService.register({ fullName, email, password }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.isRegistered.set(true);
+        this.registerForm.reset();
       },
       error: (err) => {
         this.isLoading.set(false);

@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit {
   // States using Signals
   courses = signal<Course[]>([]);
   selectedCategory = signal<string>('All');
+  searchQuery = signal<string>('');
   currentPage = signal<number>(0);
   selectedCourse = signal<Course | null>(null);
   isLoading = signal<boolean>(true);
@@ -46,7 +47,7 @@ export class DashboardComponent implements OnInit {
       price: 49.99
     },
     {
-      title: "Advanced Prompt Engineering",
+      title: "Advanced Prompt BootCamp Engineering",
       description: "Master complex prompt engineering frameworks and build multi-agent LLM systems.",
       imageUrl: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&auto=format&fit=crop&q=60",
       category: "Generative AI",
@@ -268,7 +269,7 @@ export class DashboardComponent implements OnInit {
   ];
 
   // Categories list (added Backend Development)
-  categories = [
+  readonly categories: string[] = [
     'All',
     'Generative AI',
     'Data Science',
@@ -286,11 +287,23 @@ export class DashboardComponent implements OnInit {
   // Computed properties
   filteredCourses = computed(() => {
     const category = this.selectedCategory();
-    const allCourses = this.courses();
-    if (category === 'All') {
-      return allCourses;
+    const query = this.searchQuery().toLowerCase().trim();
+    let result = this.courses();
+
+    if (category !== 'All') {
+      result = result.filter(c => c.category === category);
     }
-    return allCourses.filter(c => c.category === category);
+
+    if (query) {
+      result = result.filter(c =>
+        c.title.toLowerCase().includes(query) ||
+        c.description.toLowerCase().includes(query) ||
+        c.category.toLowerCase().includes(query) ||
+        (c.instructor && c.instructor.toLowerCase().includes(query))
+      );
+    }
+
+    return result;
   });
 
   totalPages = computed(() => {
@@ -315,9 +328,10 @@ export class DashboardComponent implements OnInit {
   fetchCourses() {
     this.isLoading.set(true);
     this.courseService.getCourses().subscribe({
-      next: (data) => {
-        if (data && data.length > 0) {
-          this.courses.set(data);
+      next: (res) => {
+        const courseList = res?.courses || [];
+        if (courseList && courseList.length > 0) {
+          this.courses.set(courseList);
         } else {
           this.courses.set(this.fallbackCourses);
         }
@@ -334,6 +348,12 @@ export class DashboardComponent implements OnInit {
   selectCategory(category: string) {
     this.selectedCategory.set(category);
     this.currentPage.set(0); // Reset page on category change
+  }
+
+  onSearchChange(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.currentPage.set(0); // Reset page on search change
   }
 
   nextPage() {

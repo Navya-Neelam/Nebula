@@ -2,6 +2,8 @@ package com.nebula.auth.dto;
 
 public class AuthResponse {
     private String token;
+    private String refreshToken;
+    private String role;
     private String id;
     private String fullName;
     private String email;
@@ -9,8 +11,10 @@ public class AuthResponse {
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, String id, String fullName, String email) {
+    public AuthResponse(String token, String refreshToken, String role, String id, String fullName, String email) {
         this.token = token;
+        this.refreshToken = refreshToken;
+        this.role = role;
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -22,6 +26,22 @@ public class AuthResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getId() {

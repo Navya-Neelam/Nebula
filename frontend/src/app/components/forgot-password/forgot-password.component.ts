@@ -32,13 +32,12 @@ export class ForgotPasswordComponent {
     const email = this.form.value.email?.trim() ?? '';
 
     this.error = null;
+    this.message = null;
     this.isLoading.set(true);
     this.auth.forgotPassword({ email }).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.message = res.message || 'OTP sent successfully';
-        sessionStorage.setItem('resetEmail', email);
-        setTimeout(() => this.router.navigate(['/verify-otp']), 800);
+        this.message = res.message || 'A secure password reset link has been sent to your email.';
       },
       error: (err) => {
         this.isLoading.set(false);

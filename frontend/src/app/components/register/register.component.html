@@ -17,6 +17,13 @@
       </div>
     }
 
+    @if (isRegistered()) {
+      <div style="background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.25); color: #2dd4bf; padding: 16px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: center; line-height: 1.5;">
+        🎉 <strong>Registration Successful!</strong><br>
+        We've sent a verification link to your email. Please click the link to verify and activate your account.
+      </div>
+    }
+
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <!-- Full Name Field -->
       <div class="form-group">

@@ -41,15 +41,17 @@ export class VerifyOtpComponent {
     const otp = this.form.value.otp?.trim() ?? '';
 
     this.error = null;
+    sessionStorage.removeItem('resetToken');
     this.isLoading.set(true);
     this.auth.verifyOtp({ email, otp }).subscribe({
-      next: (res) => {
+      next: (res: { message: string; resetToken: string }) => {
         this.isLoading.set(false);
         this.message = res.message || 'OTP Verified';
         sessionStorage.setItem('otpVerifiedEmail', email);
+        sessionStorage.setItem('resetToken', res.resetToken);
         setTimeout(() => this.router.navigate(['/reset-password']), 800);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading.set(false);
         this.error = err.error?.message || 'Unable to verify OTP';
       }

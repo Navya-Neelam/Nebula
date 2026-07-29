@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -10,29 +10,42 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password.component.html'
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    otp: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
     newPassword: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)]],
     confirmPassword: ['', [Validators.required]]
   });
 
+  token = signal<string | null>(null);
   message: string | null = null;
   error: string | null = null;
+  showNewPassword = signal(false);
+  showConfirmPassword = signal(false);
   isLoading = signal(false);
 
-  constructor() {
-    const resetEmail = sessionStorage.getItem('resetEmail');
-    const verifiedEmail = sessionStorage.getItem('otpVerifiedEmail');
-    const email = verifiedEmail || resetEmail || '';
-    if (email) {
-      this.form.patchValue({ email });
+  ngOnInit() {
+    const t = this.route.snapshot.queryParams['token'];
+    if (t) {
+      this.token.set(t);
+    } else {
+      const fallback = sessionStorage.getItem('resetToken');
+      if (fallback) {
+        this.token.set(fallback);
+      }
     }
+  }
+
+  toggleNewPassword() {
+    this.showNewPassword.update(v => !v);
+  }
+
+  toggleConfirmPassword() {
+    this.showConfirmPassword.update(v => !v);
   }
 
   onSubmit() {
@@ -46,19 +59,24 @@ export class ResetPasswordComponent {
       return;
     }
 
-    const email = this.form.value.email?.trim() ?? '';
-    const otp = this.form.value.otp?.trim() ?? '';
+    const resetToken = this.token() ?? '';
     const newPassword = this.form.value.newPassword ?? '';
     const confirmPassword = this.form.value.confirmPassword ?? '';
 
+    if (!resetToken) {
+      this.error = 'Invalid or missing reset token. Please request a new link.';
+      return;
+    }
+
     this.error = null;
     this.isLoading.set(true);
-    this.auth.resetPassword({ email, otp, newPassword, confirmPassword }).subscribe({
+    this.auth.resetPassword({ resetToken, newPassword, confirmPassword }).subscribe({
       next: (res) => {
         this.isLoading.set(false);
         this.message = res.message || 'Password reset successful';
         sessionStorage.removeItem('resetEmail');
         sessionStorage.removeItem('otpVerifiedEmail');
+        sessionStorage.removeItem('resetToken');
         setTimeout(() => this.router.navigate(['/login']), 1200);
       },
       error: (err) => {

@@ -1,10 +1,14 @@
 package com.nebula.auth.config;
 
 import com.nebula.auth.model.Course;
+import com.nebula.auth.model.User;
 import com.nebula.auth.repository.CourseRepository;
+import com.nebula.auth.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,13 +16,44 @@ import java.util.List;
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DatabaseSeeder(CourseRepository courseRepository) {
+    public DatabaseSeeder(CourseRepository courseRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        // Clear and seed users with specific roles
+        userRepository.deleteAll();
+
+        User admin = new User("System Admin", "admin@nebula.com", passwordEncoder.encode("Password123"), LocalDateTime.now());
+        admin.setRole("ADMIN");
+        admin.setVerified(true);
+        admin.setActive(true);
+        admin.setFirstName("System");
+        admin.setLastName("Admin");
+        userRepository.save(admin);
+
+        User instructor = new User("Dr. Clara Sterling", "clara@nebula.com", passwordEncoder.encode("Password123"), LocalDateTime.now());
+        instructor.setRole("INSTRUCTOR");
+        instructor.setVerified(true);
+        instructor.setActive(true);
+        instructor.setFirstName("Clara");
+        instructor.setLastName("Sterling");
+        User savedInstructor = userRepository.save(instructor);
+
+        User student = new User("Jane Student", "student@nebula.com", passwordEncoder.encode("Password123"), LocalDateTime.now());
+        student.setRole("STUDENT");
+        student.setVerified(true);
+        student.setActive(true);
+        student.setFirstName("Jane");
+        student.setLastName("Student");
+        userRepository.save(student);
+
         // Clear and re-seed to ensure all courses contain the new price field and backend courses
         courseRepository.deleteAll();
 
@@ -255,6 +290,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                 29.99
             )
         );
+        User clara = userRepository.findByEmail("clara@nebula.com").orElse(null);
+        String claraId = clara != null ? clara.getId() : null;
+        for (Course c : courses) {
+            c.setInstructorId(claraId);
+        }
         courseRepository.saveAll(courses);
     }
 }

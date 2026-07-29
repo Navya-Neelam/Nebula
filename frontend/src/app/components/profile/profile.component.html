@@ -1,0 +1,362 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple" style="top: -200px; left: -200px; width: 600px; height: 600px;"></div>
+  <div class="nebula-blob blob-teal" style="bottom: -200px; right: -200px; width: 700px; height: 700px;"></div>
+  <div class="nebula-blob blob-pink" style="top: 30%; left: 40%; width: 500px; height: 500px; opacity: 0.3;"></div>
+</div>
+
+<style>
+  .profile-layout {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: rgba(17, 24, 39, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    margin-bottom: 40px;
+  }
+
+  .logo-brand {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .back-dashboard-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .back-dashboard-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .profile-grid {
+      grid-template-columns: 320px 1fr;
+    }
+  }
+
+  .avatar-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    border: 3px solid var(--accent-purple);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .avatar-wrapper:hover .avatar-img {
+    transform: scale(1.08);
+  }
+
+  .avatar-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(17, 24, 39, 0.75);
+    padding: 6px 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-teal);
+    text-transform: uppercase;
+  }
+
+  .profile-role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-purple);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .profile-form-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (min-width: 576px) {
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Password Dialog Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 8, 22, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-card {
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+</style>
+
+<div class="profile-layout">
+  <!-- Navigation Header -->
+  <header class="header-nav animate-fade-in">
+    <a routerLink="/dashboard" class="logo-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor"/>
+        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Nebula Academy
+    </a>
+    <a routerLink="/dashboard" class="back-dashboard-btn">Back to Dashboard</a>
+  </header>
+
+  <!-- Notification messages -->
+  @if (profileMessage()) {
+    <div style="background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.25); color: #5eead4; padding: 12px; border-radius: 10px; margin-bottom: 24px; font-size: 14px; text-align: center;">
+      {{ profileMessage() }}
+    </div>
+  }
+  @if (profileError()) {
+    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 12px; border-radius: 10px; margin-bottom: 24px; font-size: 14px; text-align: center;">
+      {{ profileError() }}
+    </div>
+  }
+
+  <main class="profile-grid">
+    
+    <!-- Left Column: Avatar & Quick Info -->
+    <section class="avatar-card animate-fade-in">
+      <div class="avatar-wrapper" (click)="imageInput.click()">
+        @if (imagePreview()) {
+          <img [src]="imagePreview()" alt="Avatar" class="avatar-img" />
+        } @else {
+          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); color: var(--text-secondary);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="48" height="48">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </div>
+        }
+        <div class="avatar-overlay">
+          {{ isUploadingImage() ? 'Uploading...' : 'Upload' }}
+        </div>
+      </div>
+      <input type="file" #imageInput style="display: none;" accept="image/*" (change)="onImageSelected($event)" />
+
+      @if (authService.currentUser(); as user) {
+        <span class="profile-role-badge">{{ user.role }}</span>
+        <h3 style="color: white; font-size: 20px; font-weight: 600; margin-bottom: 6px;">{{ user.fullName }}</h3>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">{{ user.email }}</p>
+      }
+
+      <button (click)="showPasswordDialog.set(true)" class="back-dashboard-btn" style="width: 100%; padding: 12px; font-weight: 600;">
+        Change Password
+      </button>
+    </section>
+
+    <!-- Right Column: Settings Form -->
+    <section class="profile-form-card animate-fade-in">
+      <h2 style="color: white; font-size: 22px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px;">
+        Profile Settings
+      </h2>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()">
+        <div class="form-row">
+          <!-- First Name -->
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input formControlName="firstName" class="form-input" [class.is-invalid]="isFieldInvalid('profile', 'firstName')" placeholder="First name" />
+            @if (isFieldInvalid('profile', 'firstName')) {
+              <span class="field-error">First name is required</span>
+            }
+          </div>
+
+          <!-- Last Name -->
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input formControlName="lastName" class="form-input" [class.is-invalid]="isFieldInvalid('profile', 'lastName')" placeholder="Last name" />
+            @if (isFieldInvalid('profile', 'lastName')) {
+              <span class="field-error">Last name is required</span>
+            }
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input formControlName="phoneNumber" class="form-input" [class.is-invalid]="isFieldInvalid('profile', 'phoneNumber')" placeholder="+1234567890" />
+          @if (isFieldInvalid('profile', 'phoneNumber')) {
+            <span class="field-error">Please enter a valid phone number</span>
+          }
+        </div>
+
+        <!-- Bio -->
+        <div class="form-group">
+          <label class="form-label">Biography</label>
+          <textarea formControlName="bio" class="form-input" style="height: 120px; resize: vertical;" [class.is-invalid]="isFieldInvalid('profile', 'bio')" placeholder="Tell us about yourself..."></textarea>
+          @if (isFieldInvalid('profile', 'bio')) {
+            <span class="field-error">Biography must be under 500 characters</span>
+          }
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="isSavingProfile() || profileForm.invalid">
+          @if (isSavingProfile()) {
+            <div class="spinner"></div>
+            Saving Details...
+          } @else {
+            Save Changes
+          }
+        </button>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<!-- Change Password Modal Dialog -->
+@if (showPasswordDialog()) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="color: white; font-size: 20px; font-weight: 700; margin-bottom: 20px;">Change Password</h3>
+
+      @if (passwordMessage()) {
+        <div style="background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.25); color: #5eead4; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; text-align: center;">
+          {{ passwordMessage() }}
+        </div>
+      }
+      @if (passwordError()) {
+        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; text-align: center;">
+          {{ passwordError() }}
+        </div>
+      }
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+        <!-- Current Password -->
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" formControlName="oldPassword" class="form-input" [class.is-invalid]="isFieldInvalid('password', 'oldPassword')" placeholder="••••••••" />
+          @if (isFieldInvalid('password', 'oldPassword')) {
+            <span class="field-error">Current password is required</span>
+          }
+        </div>
+
+        <!-- New Password -->
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" formControlName="newPassword" class="form-input" [class.is-invalid]="isFieldInvalid('password', 'newPassword')" placeholder="••••••••" />
+          @if (isFieldInvalid('password', 'newPassword')) {
+            <span class="field-error">
+              @if (passwordForm.get('newPassword')?.errors?.['required']) { New password is required }
+              @else if (passwordForm.get('newPassword')?.errors?.['minlength']) { Password must be at least 8 characters }
+              @else if (passwordForm.get('newPassword')?.errors?.['pattern']) { Password must contain uppercase, lowercase, number, and special character }
+            </span>
+          }
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" formControlName="confirmPassword" class="form-input" [class.is-invalid]="isFieldInvalid('password', 'confirmPassword')" placeholder="••••••••" />
+          @if (isFieldInvalid('password', 'confirmPassword')) {
+            <span class="field-error">Please confirm your new password</span>
+          }
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="button" (click)="showPasswordDialog.set(false); passwordError.set(null);" class="back-dashboard-btn" style="flex: 1; text-align: center; border-radius: 12px; padding: 12px;">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" style="flex: 1; box-shadow: none;" [disabled]="isChangingPassword() || passwordForm.invalid">
+            @if (isChangingPassword()) {
+              <div class="spinner"></div>
+            } @else {
+              Update
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

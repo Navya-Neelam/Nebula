@@ -23,6 +23,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -37,7 +38,16 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/forgot-password", "/api/auth/verify-otp", "/api/auth/reset-password").permitAll()
+                .requestMatchers(
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/api/auth/forgot-password",
+                    "/api/auth/verify-otp",
+                    "/api/auth/reset-password",
+                    "/api/auth/verify",
+                    "/api/auth/refresh-token",
+                    "/api/auth/logout"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

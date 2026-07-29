@@ -41,6 +41,18 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Nebula Auth - Password Reset", html);
     }
 
+    public void sendVerificationEmail(String toEmail, String token) {
+        String verifyLink = frontendUrl + "/verify?token=" + token;
+        String html = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;'>"
+                + "<h2 style='color: #14b8a6;'>Verify Your Email</h2>"
+                + "<p>Welcome to Nebula Academy! Please verify your email address to activate your account.</p>"
+                + "<p><a href='" + verifyLink + "' style='display:inline-block;padding:12px 20px;background:#14b8a6;color:#fff;text-decoration:none;border-radius:8px;'>Verify Email</a></p>"
+                + "<p>If you did not create an account, you can safely ignore this email.</p>"
+                + "</div>";
+
+        sendHtmlEmail(toEmail, "Nebula Academy - Verify Your Email", html);
+    }
+
     public void sendOtpEmail(String toEmail, String otp) {
         if (!shouldSendEmail()) {
             log.info("--- [DEVELOPMENT/TEST MODE] OTP generated for {}: {} ---", toEmail, otp);

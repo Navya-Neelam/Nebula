@@ -2,6 +2,7 @@ package com.nebula.auth.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDateTime;
 
 @Document(collection = "courses")
 public class Course {
@@ -10,27 +11,39 @@ public class Course {
     private String id;
     private String title;
     private String description;
-    private String imageUrl;
+    private String imageUrl; // For backward compatibility with existing front-end images
+    private String thumbnail; // Matches requirement: thumbnail
     private String category;
     private String duration;
     private Double rating;
-    private String instructor;
+    private String instructor; // Name of instructor
+    private String instructorId; // ID of instructor user
     private String detailDescription;
     private Double price;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
+    private String status = "PUBLISHED"; // PUBLISHED or DRAFT
 
     public Course() {
+        this.createdDate = LocalDateTime.now();
+        this.updatedDate = LocalDateTime.now();
+        this.status = "PUBLISHED";
     }
 
     public Course(String title, String description, String imageUrl, String category, String duration, Double rating, String instructor, String detailDescription, Double price) {
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.thumbnail = imageUrl;
         this.category = category;
         this.duration = duration;
         this.rating = rating;
         this.instructor = instructor;
         this.detailDescription = detailDescription;
         this.price = price;
+        this.createdDate = LocalDateTime.now();
+        this.updatedDate = LocalDateTime.now();
+        this.status = "PUBLISHED";
     }
 
     public String getId() {
@@ -63,6 +76,16 @@ public class Course {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        this.thumbnail = imageUrl;
+    }
+
+    public String getThumbnail() {
+        return thumbnail != null ? thumbnail : imageUrl;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+        this.imageUrl = thumbnail;
     }
 
     public String getCategory() {
@@ -97,6 +120,14 @@ public class Course {
         this.instructor = instructor;
     }
 
+    public String getInstructorId() {
+        return instructorId;
+    }
+
+    public void setInstructorId(String instructorId) {
+        this.instructorId = instructorId;
+    }
+
     public String getDetailDescription() {
         return detailDescription;
     }
@@ -111,5 +142,29 @@ public class Course {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -20,6 +20,8 @@ public class PasswordResetOtp {
 
     private String otpHash;
 
+    private String resetTokenHash;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime expiresAt;
@@ -64,6 +66,14 @@ public class PasswordResetOtp {
 
     public void setOtpHash(String otpHash) {
         this.otpHash = otpHash;
+    }
+
+    public String getResetTokenHash() {
+        return resetTokenHash;
+    }
+
+    public void setResetTokenHash(String resetTokenHash) {
+        this.resetTokenHash = resetTokenHash;
     }
 
     public LocalDateTime getCreatedAt() {

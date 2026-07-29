@@ -1,0 +1,77 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple"></div>
+  <div class="nebula-blob blob-teal"></div>
+  <div class="nebula-blob blob-pink"></div>
+</div>
+
+<div class="route-wrapper">
+  <div class="glass-card animate-fade-in" style="max-width: 500px; text-align: center;">
+    
+    <!-- Header -->
+    <div style="margin-bottom: 28px;">
+      <h2 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #14b8a6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">
+        Email Verification
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 15px;">
+        Nebula Academy Authentication System
+      </p>
+    </div>
+
+    <!-- Verifying State -->
+    @if (isVerifying()) {
+      <div style="padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div class="spinner" style="width: 48px; height: 48px; border-width: 4px; border-top-color: var(--accent-purple);"></div>
+        <p style="color: var(--text-primary); font-size: 16px;">
+          Verifying your email address, please wait...
+        </p>
+      </div>
+    }
+
+    <!-- Success State -->
+    @if (!isVerifying() && isSuccess()) {
+      <div style="padding: 10px 0;">
+        <div style="width: 72px; height: 72px; background: rgba(20, 184, 166, 0.15); border: 2px solid var(--accent-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="var(--accent-teal)" width="36" height="36">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>
+        </div>
+        
+        <h3 style="color: white; font-size: 20px; font-weight: 600; margin-bottom: 12px;">
+          Email Verified Successfully!
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin-bottom: 28px;">
+          Your account is now active. You can log in and start exploring your courses.
+        </p>
+
+        <a routerLink="/login" class="btn-primary" style="text-decoration: none; width: 100%;">
+          Proceed to Login
+        </a>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (!isVerifying() && !isSuccess()) {
+      <div style="padding: 10px 0;">
+        <div style="width: 72px; height: 72px; background: rgba(236, 72, 153, 0.15); border: 2px solid var(--accent-pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="var(--accent-pink)" width="36" height="36">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+          </svg>
+        </div>
+        
+        <h3 style="color: white; font-size: 20px; font-weight: 600; margin-bottom: 12px;">
+          Verification Failed
+        </h3>
+        <p style="color: #f87171; font-size: 14px; line-height: 1.6; margin-bottom: 28px;">
+          {{ errorMessage() }}
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a routerLink="/login" class="btn-primary" style="text-decoration: none; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%); border: 1px solid var(--card-border); box-shadow: none; color: white;">
+            Back to Login
+          </a>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

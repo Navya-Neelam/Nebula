@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     }
 
     @Override
-    public void verifyOtp(String email, String otp) {
+    public String verifyOtp(String email, String otp) {
         PasswordResetOtp resetOtp = passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow(() -> new InvalidOtpException("No OTP was found for this email"));
 
@@ -84,13 +85,16 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             throw new InvalidOtpException("Invalid OTP");
         }
 
+        String resetToken = generateResetToken();
         resetOtp.setVerified(true);
+        resetOtp.setResetTokenHash(passwordEncoder.encode(resetToken));
         resetOtp.setAttempts(0);
         passwordResetOtpRepository.save(resetOtp);
+        return resetToken;
     }
 
     @Override
-    public void resetPassword(String email, String otp, String newPassword) {
+    public void resetPassword(String email, String resetToken, String newPassword) {
         PasswordResetOtp resetOtp = passwordResetOtpRepository.findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow(() -> new InvalidOtpException("No OTP was found for this email"));
 
@@ -106,8 +110,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
             throw new InvalidOtpException("OTP expired");
         }
 
-        if (!passwordEncoder.matches(otp, resetOtp.getOtpHash())) {
-            throw new InvalidOtpException("Invalid OTP");
+        if (resetOtp.getResetTokenHash() == null || !passwordEncoder.matches(resetToken, resetOtp.getResetTokenHash())) {
+            throw new InvalidOtpException("Invalid or expired reset session");
         }
 
         User user = userRepository.findByEmail(email)
@@ -124,5 +128,11 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         SecureRandom random = new SecureRandom();
         int otp = 1000 + random.nextInt(9000);
         return String.format("%04d", otp);
+    }
+
+    private String generateResetToken() {
+        byte[] tokenBytes = new byte[32];
+        new SecureRandom().nextBytes(tokenBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 }

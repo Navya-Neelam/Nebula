@@ -5,12 +5,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class ResetPasswordRequest {
-    @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank(message = "OTP is required")
-    @Pattern(regexp = "\\d{4}", message = "OTP must contain exactly 4 digits")
-    private String otp;
+    @NotBlank(message = "Reset session is required")
+    private String resetToken;
 
     @NotBlank(message = "New password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
@@ -30,12 +28,12 @@ public class ResetPasswordRequest {
         this.email = email;
     }
 
-    public String getOtp() {
-        return otp;
+    public String getResetToken() {
+        return resetToken;
     }
 
-    public void setOtp(String otp) {
-        this.otp = otp;
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 
     public String getNewPassword() {
