@@ -85,7 +85,7 @@ export class AuthService {
 
   login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(res => this.handleAuthSuccess(res))
+      tap(res => this.handleAuthSuccess(res, !!credentials?.rememberMe))
     );
   }
 
@@ -95,19 +95,23 @@ export class AuthService {
 
   verifyLoginOtp(payload: { email: string; otp: string; rememberMe?: boolean }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/verify-login-otp`, payload).pipe(
-      tap(res => this.handleAuthSuccess(res))
+      tap(res => this.handleAuthSuccess(res, !!payload?.rememberMe))
     );
   }
 
   refreshToken(): Observable<AuthResponse> {
-    const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken') || '';
+    const refreshToken = sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken') || '';
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken }).pipe(
       tap(res => {
-        localStorage.setItem('token', res.token);
         sessionStorage.setItem('token', res.token);
+        if (localStorage.getItem('token')) {
+          localStorage.setItem('token', res.token);
+        }
         if (res.refreshToken) {
-          localStorage.setItem('refreshToken', res.refreshToken);
           sessionStorage.setItem('refreshToken', res.refreshToken);
+          if (localStorage.getItem('refreshToken')) {
+            localStorage.setItem('refreshToken', res.refreshToken);
+          }
         }
       })
     );
@@ -117,8 +121,10 @@ export class AuthService {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
       tap(user => {
         this.currentUser.set(user);
-        localStorage.setItem('user', JSON.stringify(user));
         sessionStorage.setItem('user', JSON.stringify(user));
+        if (localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       })
     );
   }
@@ -127,8 +133,10 @@ export class AuthService {
     return this.http.put<User>(`${this.apiUrl}/profile`, profileData).pipe(
       tap(user => {
         this.currentUser.set(user);
-        localStorage.setItem('user', JSON.stringify(user));
         sessionStorage.setItem('user', JSON.stringify(user));
+        if (localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       })
     );
   }
@@ -147,15 +155,17 @@ export class AuthService {
             profileImageUrl: res.imageUrl
           };
           this.currentUser.set(updated);
-          localStorage.setItem('user', JSON.stringify(updated));
           sessionStorage.setItem('user', JSON.stringify(updated));
+          if (localStorage.getItem('user')) {
+            localStorage.setItem('user', JSON.stringify(updated));
+          }
         }
       })
     );
   }
 
   logout() {
-    const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+    const refreshToken = sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken');
     if (refreshToken) {
       this.http.post(`${this.apiUrl}/logout`, { refreshToken }).subscribe({
         next: () => this.clearSessionAndRedirect(),
@@ -177,11 +187,18 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  private handleAuthSuccess(res: AuthResponse) {
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('refreshToken', res.refreshToken);
+  private handleAuthSuccess(res: AuthResponse, rememberMe: boolean = false) {
     sessionStorage.setItem('token', res.token);
     sessionStorage.setItem('refreshToken', res.refreshToken);
+
+    if (rememberMe) {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('refreshToken', res.refreshToken);
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+    }
 
     const user: User = {
       id: res.id,
@@ -193,8 +210,10 @@ export class AuthService {
       isActive: true
     };
 
-    localStorage.setItem('user', JSON.stringify(user));
     sessionStorage.setItem('user', JSON.stringify(user));
+    if (rememberMe) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
     this.currentUser.set(user);
   }
 
