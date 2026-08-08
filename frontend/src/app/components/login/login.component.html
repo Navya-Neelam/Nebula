@@ -6,9 +6,29 @@
 
 <div class="route-wrapper">
   <div class="glass-card animate-fade-in">
-    <div style="text-align: center; margin-bottom: 32px;">
+    <div style="text-align: center; margin-bottom: 24px;">
       <h2 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #14b8a6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">Nebula Auth</h2>
       <p style="color: var(--text-secondary); font-size: 15px;">Welcome back! Sign in to your account.</p>
+    </div>
+
+    <!-- Login Mode Tabs -->
+    <div style="display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 4px; margin-bottom: 24px;">
+      <button 
+        type="button" 
+        (click)="switchTab('password')"
+        [style.background]="loginTab() === 'password' ? 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)' : 'transparent'"
+        [style.color]="loginTab() === 'password' ? '#ffffff' : 'var(--text-secondary)'"
+        style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+        🔑 Password
+      </button>
+      <button 
+        type="button" 
+        (click)="switchTab('otp')"
+        [style.background]="loginTab() === 'otp' ? 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)' : 'transparent'"
+        [style.color]="loginTab() === 'otp' ? '#ffffff' : 'var(--text-secondary)'"
+        style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+        ⚡ OTP Code
+      </button>
     </div>
 
     @if (errorMessage()) {
@@ -17,91 +37,192 @@
       </div>
     }
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <!-- Email Field -->
-      <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
-        <div class="input-container">
-          <input 
-            type="email" 
-            id="email" 
-            formControlName="email" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('email')"
-            placeholder="name@example.com"
-          />
-        </div>
-        @if (isFieldInvalid('email')) {
-          <span class="field-error">
-            @if (loginForm.get('email')?.errors?.['required']) {
-              Email is required
-            } @else if (loginForm.get('email')?.errors?.['email']) {
-              Please enter a valid email address
-            }
-          </span>
-        }
+    @if (successMessage()) {
+      <div style="background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.3); color: #2dd4bf; padding: 12px; border-radius: 10px; margin-bottom: 24px; font-size: 14px; text-align: center;">
+        {{ successMessage() }}
       </div>
+    }
 
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-container">
-          <input 
-            [type]="showPassword() ? 'text' : 'password'" 
-            id="password" 
-            formControlName="password" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('password')"
-            placeholder="••••••••"
-          />
-          <button type="button" class="password-toggle-btn" (click)="togglePassword()" aria-label="Toggle password visibility">
-            @if (showPassword()) {
-              <!-- Eye Off SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
-              </svg>
+    <!-- PASSWORD LOGIN FORM -->
+    @if (loginTab() === 'password') {
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="input-container">
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email" 
+              class="form-input" 
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="name@example.com"
+            />
+          </div>
+          @if (isFieldInvalid('email')) {
+            <span class="field-error">
+              @if (loginForm.get('email')?.errors?.['required']) {
+                Email is required
+              } @else if (loginForm.get('email')?.errors?.['email']) {
+                Please enter a valid email address
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-container">
+            <input 
+              [type]="showPassword() ? 'text' : 'password'" 
+              id="password" 
+              formControlName="password" 
+              class="form-input" 
+              [class.is-invalid]="isFieldInvalid('password')"
+              placeholder="••••••••"
+            />
+            <button type="button" class="password-toggle-btn" (click)="togglePassword()" aria-label="Toggle password visibility">
+              @if (showPassword()) {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+              }
+            </button>
+          </div>
+          @if (isFieldInvalid('password')) {
+            <span class="field-error">
+              Password is required
+            </span>
+          }
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; margin-bottom: 24px; font-size: 14px;">
+          <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; user-select: none;">
+            <input 
+              type="checkbox" 
+              formControlName="rememberMe" 
+              style="width: 16px; height: 16px; accent-color: #a855f7; cursor: pointer;"
+            />
+            Remember Me (30 Days)
+          </label>
+          <a routerLink="/forgot-password" class="auth-link">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-primary" [disabled]="isLoading() || loginForm.invalid">
+          @if (isLoading()) {
+            <div class="spinner"></div>
+            Signing In...
+          } @else {
+            Sign In
+          }
+        </button>
+      </form>
+    }
+
+    <!-- OTP LOGIN FORM -->
+    @if (loginTab() === 'otp') {
+      <form [formGroup]="otpForm" (ngSubmit)="verifyOtpLogin()">
+        <!-- Email Field & Send Code Button -->
+        <div class="form-group">
+          <label for="otpEmail" class="form-label">Email Address</label>
+          <div style="display: flex; gap: 10px;">
+            <div class="input-container" style="flex: 1;">
+              <input 
+                type="email" 
+                id="otpEmail" 
+                formControlName="email" 
+                class="form-input" 
+                [class.is-invalid]="isOtpFieldInvalid('email')"
+                placeholder="name@example.com"
+              />
+            </div>
+            <button 
+              type="button" 
+              (click)="sendOtp()" 
+              [disabled]="isSendingOtp() || resendCooldown() > 0"
+              style="padding: 0 16px; background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;">
+              @if (isSendingOtp()) {
+                Sending...
+              } @else if (resendCooldown() > 0) {
+                Resend in {{ resendCooldown() }}s
+              } @else {
+                {{ otpSent() ? 'Resend OTP' : 'Send OTP' }}
+              }
+            </button>
+          </div>
+          @if (isOtpFieldInvalid('email')) {
+            <span class="field-error">Please enter a valid email address</span>
+          }
+        </div>
+
+        <!-- 6-Digit OTP Field -->
+        @if (otpSent()) {
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="otpCode" class="form-label" style="margin-bottom: 0;">6-Digit OTP Code</label>
+              @if (otpCountdown() > 0) {
+                <span style="font-size: 12px; font-weight: 600; color: #2dd4bf; background: rgba(20, 184, 166, 0.15); padding: 2px 8px; border-radius: 6px;">
+                  ⏱️ Expires in {{ formatTimer(otpCountdown()) }}
+                </span>
+              } @else {
+                <span style="font-size: 12px; font-weight: 600; color: #f87171; background: rgba(239, 68, 68, 0.15); padding: 2px 8px; border-radius: 6px;">
+                  ⚠️ Code Expired
+                </span>
+              }
+            </div>
+
+            <div class="input-container">
+              <input 
+                type="text" 
+                id="otpCode" 
+                formControlName="otp" 
+                maxlength="6"
+                class="form-input" 
+                [class.is-invalid]="isOtpFieldInvalid('otp')"
+                placeholder="123456"
+                style="letter-spacing: 6px; font-size: 18px; font-weight: 700; text-align: center;"
+              />
+            </div>
+            @if (isOtpFieldInvalid('otp')) {
+              <span class="field-error">Please enter the 6-digit numerical code</span>
+            }
+          </div>
+
+          <!-- Remember Me -->
+          <div style="margin-top: 16px; margin-bottom: 24px; font-size: 14px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; user-select: none;">
+              <input 
+                type="checkbox" 
+                formControlName="rememberMe" 
+                style="width: 16px; height: 16px; accent-color: #14b8a6; cursor: pointer;"
+              />
+              Remember Me (30 Days)
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-primary" [disabled]="isLoading() || otpForm.invalid || otpCountdown() === 0" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+            @if (isLoading()) {
+              <div class="spinner"></div>
+              Verifying Code...
             } @else {
-              <!-- Eye SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
+              Sign In with OTP
             }
           </button>
-        </div>
-        @if (isFieldInvalid('password')) {
-          <span class="field-error">
-            Password is required
-          </span>
         }
-      </div>
-
-      <!-- Remember Me & Forgot Password -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; margin-bottom: 24px; font-size: 14px;">
-        <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; user-select: none;">
-          <input 
-            type="checkbox" 
-            formControlName="rememberMe" 
-            style="width: 16px; height: 16px; accent-color: #a855f7; cursor: pointer;"
-          />
-          Remember Me (30 Days)
-        </label>
-        <a routerLink="/forgot-password" class="auth-link">Forgot password?</a>
-      </div>
-
-      <!-- Submit Button -->
-      <button type="submit" class="btn-primary" [disabled]="isLoading() || loginForm.invalid">
-        @if (isLoading()) {
-          <div class="spinner"></div>
-          Signing In...
-        } @else {
-          Sign In
-        }
-      </button>
-    </form>
+      </form>
+    }
 
     <!-- Footer Links -->
-    <div class="auth-footer">
+    <div class="auth-footer" style="margin-top: 24px;">
       Don't have an account? 
       <a routerLink="/register" class="auth-link">Create one</a>
     </div>

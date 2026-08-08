@@ -5,7 +5,9 @@ import com.nebula.auth.dto.ForgotPasswordRequest;
 import com.nebula.auth.dto.LoginRequest;
 import com.nebula.auth.dto.RegisterRequest;
 import com.nebula.auth.dto.ResetPasswordRequest;
+import com.nebula.auth.dto.SendOtpRequest;
 import com.nebula.auth.dto.UserResponse;
+import com.nebula.auth.dto.VerifyLoginOtpRequest;
 import com.nebula.auth.model.User;
 import com.nebula.auth.repository.UserRepository;
 import com.nebula.auth.service.UserService;
@@ -41,6 +43,18 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/send-login-otp")
+    public ResponseEntity<Map<String, String>> sendLoginOtp(@Valid @RequestBody SendOtpRequest request) {
+        String msg = userService.sendLoginOtp(request);
+        return ResponseEntity.ok(Map.of("message", msg));
+    }
+
+    @PostMapping("/verify-login-otp")
+    public ResponseEntity<AuthResponse> verifyLoginOtp(@Valid @RequestBody VerifyLoginOtpRequest request) {
+        AuthResponse response = userService.verifyLoginOtp(request);
         return ResponseEntity.ok(response);
     }
 

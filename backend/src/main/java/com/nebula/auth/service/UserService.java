@@ -3,14 +3,19 @@ package com.nebula.auth.service;
 import com.nebula.auth.dto.AuthResponse;
 import com.nebula.auth.dto.LoginRequest;
 import com.nebula.auth.dto.RegisterRequest;
+import com.nebula.auth.dto.SendOtpRequest;
 import com.nebula.auth.dto.UserResponse;
+import com.nebula.auth.dto.VerifyLoginOtpRequest;
 import com.nebula.auth.exception.EmailAlreadyExistsException;
+import com.nebula.auth.exception.InvalidOtpException;
 import com.nebula.auth.model.OnboardingStatus;
+import com.nebula.auth.model.OtpVerification;
 import com.nebula.auth.model.PasswordResetToken;
 import com.nebula.auth.model.RefreshToken;
 import com.nebula.auth.model.User;
 import com.nebula.auth.model.UserPreferences;
 import com.nebula.auth.model.VerificationToken;
+import com.nebula.auth.repository.OtpVerificationRepository;
 import com.nebula.auth.repository.PasswordResetTokenRepository;
 import com.nebula.auth.repository.RefreshTokenRepository;
 import com.nebula.auth.repository.UserRepository;
@@ -21,6 +26,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +46,9 @@ public class UserService {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private OtpVerificationRepository otpVerificationRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -283,6 +292,123 @@ public class UserService {
                 });
 
         return resetToken.getToken();
+    }
+
+    public String sendLoginOtp(SendOtpRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("No account registered with this email address"));
+
+        if (!user.isActive()) {
+            throw new BadCredentialsException("Your account is deactivated. Please contact the administrator.");
+        }
+
+        if (!user.isVerified()) {
+            throw new BadCredentialsException("Email not verified. Please verify your email first.");
+        }
+
+        // Rate limit / Resend protection (must wait 60s)
+        otpVerificationRepository.findTopByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(user.getEmail(), "LOGIN")
+                .ifPresent(existing -> {
+                    if (existing.getCreatedAt().plusSeconds(60).isAfter(LocalDateTime.now())) {
+                        throw new RuntimeException("Please wait 60 seconds before requesting another OTP.");
+                    }
+                });
+
+        // Generate 6-digit OTP
+        SecureRandom random = new SecureRandom();
+        String otp = String.format("%06d", random.nextInt(1000000));
+        String hashedOtp = passwordEncoder.encode(otp);
+
+        // Deactivate previous login OTPs for this email
+        otpVerificationRepository.findTopByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(user.getEmail(), "LOGIN")
+                .ifPresent(old -> {
+                    old.setUsed(true);
+                    otpVerificationRepository.save(old);
+                });
+
+        OtpVerification otpVerification = new OtpVerification(
+                user.getEmail(),
+                hashedOtp,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(5),
+                "LOGIN",
+                false
+        );
+        otpVerificationRepository.save(otpVerification);
+
+        emailService.sendLoginOtpEmail(user.getEmail(), otp);
+
+        return "OTP sent successfully to " + user.getEmail();
+    }
+
+    public AuthResponse verifyLoginOtp(VerifyLoginOtpRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        if (!user.isActive()) {
+            throw new BadCredentialsException("Account is deactivated");
+        }
+
+        if (!user.isVerified()) {
+            throw new BadCredentialsException("Email not verified");
+        }
+
+        OtpVerification otpVerification = otpVerificationRepository
+                .findTopByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(request.getEmail(), "LOGIN")
+                .orElseThrow(() -> new InvalidOtpException("Invalid or expired OTP. Please request a new code."));
+
+        if (otpVerification.getExpiresAt().isBefore(LocalDateTime.now())) {
+            otpVerification.setUsed(true);
+            otpVerificationRepository.save(otpVerification);
+            throw new InvalidOtpException("OTP has expired. Please request a new code.");
+        }
+
+        if (otpVerification.getAttempts() >= 5) {
+            otpVerification.setUsed(true);
+            otpVerificationRepository.save(otpVerification);
+            throw new InvalidOtpException("Maximum verification attempts exceeded. Please request a new OTP.");
+        }
+
+        otpVerification.setAttempts(otpVerification.getAttempts() + 1);
+
+        if (!passwordEncoder.matches(request.getOtp(), otpVerification.getOtpHash())) {
+            otpVerificationRepository.save(otpVerification);
+            int remaining = 5 - otpVerification.getAttempts();
+            throw new InvalidOtpException("Invalid OTP code. " + remaining + " attempts remaining.");
+        }
+
+        // Success: Mark verified & used
+        otpVerification.setVerified(true);
+        otpVerification.setUsed(true);
+        otpVerificationRepository.save(otpVerification);
+
+        // Update User login metadata
+        user.setRememberMeEnabled(request.isRememberMe());
+        user.setLastLogin(LocalDateTime.now());
+        user.setLoginMethod("OTP");
+        userRepository.save(user);
+
+        // Generate Access & Refresh tokens
+        String token = jwtService.generateToken(user.getEmail(), user.getRole());
+
+        refreshTokenRepository.deleteByEmail(user.getEmail());
+        String refreshTokenStr = UUID.randomUUID().toString();
+        int expiryDays = request.isRememberMe() ? 30 : 7;
+        RefreshToken refreshToken = new RefreshToken(
+                refreshTokenStr,
+                user.getEmail(),
+                LocalDateTime.now().plusDays(expiryDays)
+        );
+        refreshTokenRepository.save(refreshToken);
+
+        return new AuthResponse(
+                token,
+                refreshTokenStr,
+                user.getRole(),
+                user.getId(),
+                user.getFullName(),
+                user.getEmail()
+        );
     }
 
     public void resetPassword(String token, String newPassword) {

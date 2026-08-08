@@ -89,6 +89,16 @@ export class AuthService {
     );
   }
 
+  sendLoginOtp(payload: { email: string }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/send-login-otp`, payload);
+  }
+
+  verifyLoginOtp(payload: { email: string; otp: string; rememberMe?: boolean }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/verify-login-otp`, payload).pipe(
+      tap(res => this.handleAuthSuccess(res))
+    );
+  }
+
   refreshToken(): Observable<AuthResponse> {
     const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken') || '';
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken }).pipe(

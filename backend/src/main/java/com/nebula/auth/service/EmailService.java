@@ -71,6 +71,24 @@ public class EmailService {
         sendHtmlEmail(toEmail, "Reset Password OTP", html);
     }
 
+    public void sendLoginOtpEmail(String toEmail, String otp) {
+        if (!shouldSendEmail()) {
+            log.info("--- [DEVELOPMENT/TEST MODE] LOGIN OTP generated for {}: {} ---", toEmail, otp);
+        }
+
+        String html = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f8fafc; border-radius: 12px;'>"
+                + "<h2 style='color: #a855f7;'>Nebula Auth - Your Login OTP</h2>"
+                + "<p>Hello,</p>"
+                + "<p>Your 6-digit OTP to log in to your Nebula account is:</p>"
+                + "<div style='font-size: 32px; font-weight: 700; letter-spacing: 6px; color: #a855f7; margin: 20px 0; padding: 16px 20px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; display: inline-block;'>" + otp + "</div>"
+                + "<p>This OTP is valid for 5 minutes. Do not share this code with anyone.</p>"
+                + "<p>If you did not request this login code, please ignore this email.</p>"
+                + "<p>Thank you,<br/>Nebula Security Team</p>"
+                + "</div>";
+
+        sendHtmlEmail(toEmail, "Nebula Auth - Login OTP Code", html);
+    }
+
     private void sendHtmlEmail(String toEmail, String subject, String htmlBody) {
         if (!shouldSendEmail()) {
             log.warn("Email sending skipped for {} because SMTP credentials are not configured. OTP was generated but no email was sent.", toEmail);
