@@ -5,14 +5,16 @@ import com.nebula.auth.dto.LoginRequest;
 import com.nebula.auth.dto.RegisterRequest;
 import com.nebula.auth.dto.UserResponse;
 import com.nebula.auth.exception.EmailAlreadyExistsException;
-import com.nebula.auth.model.User;
-import com.nebula.auth.model.VerificationToken;
+import com.nebula.auth.model.OnboardingStatus;
 import com.nebula.auth.model.PasswordResetToken;
 import com.nebula.auth.model.RefreshToken;
-import com.nebula.auth.repository.UserRepository;
-import com.nebula.auth.repository.VerificationTokenRepository;
+import com.nebula.auth.model.User;
+import com.nebula.auth.model.UserPreferences;
+import com.nebula.auth.model.VerificationToken;
 import com.nebula.auth.repository.PasswordResetTokenRepository;
 import com.nebula.auth.repository.RefreshTokenRepository;
+import com.nebula.auth.repository.UserRepository;
+import com.nebula.auth.repository.VerificationTokenRepository;
 import com.nebula.auth.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -49,33 +50,81 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ProfileCompletionService profileCompletionService;
+
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("An account with this email already exists");
         }
 
-        User user = new User(
-                request.getFullName(),
-                request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                LocalDateTime.now()
-        );
-        user.setRole("STUDENT"); // Feature 1: default role STUDENT
-        user.setVerified(false); // Feature 2: account inactive until verified
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setRole("STUDENT");
+        user.setVerified(true);
         user.setActive(true);
 
-        String fullName = request.getFullName();
-        if (fullName != null && !fullName.trim().isEmpty()) {
-            String[] parts = fullName.trim().split("\\s+", 2);
-            user.setFirstName(parts[0]);
-            if (parts.length > 1) {
-                user.setLastName(parts[1]);
-            } else {
-                user.setLastName("");
-            }
+        // Step 1: Names
+        if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null && !request.getLastName().isBlank()) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getFullName() != null && !request.getFullName().isBlank()) {
+            user.setFullName(request.getFullName());
+        } else if (user.getFirstName() != null) {
+            user.setFullName(((user.getFirstName() != null ? user.getFirstName() : "") + " " + (user.getLastName() != null ? user.getLastName() : "")).trim());
         }
 
+        if (user.getFirstName() == null && user.getFullName() != null) {
+            String[] parts = user.getFullName().trim().split("\\s+", 2);
+            user.setFirstName(parts[0]);
+            user.setLastName(parts.length > 1 ? parts[1] : "");
+        }
+
+        // Step 3: Contact & Location
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getCountry() != null) {
+            user.setCountry(request.getCountry());
+        }
+        if (request.getTimeZone() != null) {
+            user.setTimezone(request.getTimeZone());
+        }
+
+        // Step 4: Preferences
+        UserPreferences preferences;
+        if (request.getUserPreferences() != null) {
+            preferences = new UserPreferences(
+                    request.getUserPreferences().getTheme() != null ? request.getUserPreferences().getTheme() : "SYSTEM",
+                    request.getUserPreferences().getLanguage() != null ? request.getUserPreferences().getLanguage() : "en",
+                    request.getUserPreferences().getTimeZone() != null ? request.getUserPreferences().getTimeZone() : (user.getTimezone() != null ? user.getTimezone() : "UTC"),
+                    request.getUserPreferences().getEmailNotifications() != null ? request.getUserPreferences().getEmailNotifications() : true,
+                    request.getUserPreferences().getMarketingEmails() != null ? request.getUserPreferences().getMarketingEmails() : false
+            );
+        } else {
+            preferences = new UserPreferences("SYSTEM", "en", user.getTimezone() != null ? user.getTimezone() : "UTC", true, false);
+        }
+        user.setUserPreferences(preferences);
+
+        // Track Onboarding Status
+        OnboardingStatus status = new OnboardingStatus(true, false, request.getUserPreferences() != null, false);
+        user.setOnboardingStatus(status);
+
+        // Calculate Profile Completion
+        profileCompletionService.calculateCompletionForUser(user);
+
         User savedUser = userRepository.save(user);
+
+        // Update IDs on sub-documents
+        preferences.setUserId(savedUser.getId());
+        status.setUserId(savedUser.getId());
+        userRepository.save(savedUser);
 
         // Generate verification token
         String tokenStr = UUID.randomUUID().toString();
@@ -115,15 +164,21 @@ public class UserService {
             throw new BadCredentialsException("Your account is deactivated. Please contact the administrator.");
         }
 
+        user.setRememberMeEnabled(request.isRememberMe());
+        user.setLastLogin(LocalDateTime.now());
+        user.setLoginMethod("PASSWORD");
+        userRepository.save(user);
+
         String token = jwtService.generateToken(user.getEmail(), user.getRole());
 
-        // Generate refresh token (Feature 4)
+        // Generate refresh token (30 days if rememberMe, 7 days default)
         refreshTokenRepository.deleteByEmail(user.getEmail()); // delete old ones
         String refreshTokenStr = UUID.randomUUID().toString();
+        int expiryDays = request.isRememberMe() ? 30 : 7;
         RefreshToken refreshToken = new RefreshToken(
                 refreshTokenStr,
                 user.getEmail(),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(expiryDays)
         );
         refreshTokenRepository.save(refreshToken);
 
@@ -150,6 +205,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setVerified(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        profileCompletionService.calculateCompletionForUser(user);
         userRepository.save(user);
         verificationTokenRepository.delete(verificationToken);
     }
@@ -193,7 +250,6 @@ public class UserService {
     public String forgotPassword(String email) {
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
-            // Do not reveal whether user exists
             return null;
         }
 
@@ -201,11 +257,11 @@ public class UserService {
         claims.put("purpose", "reset");
         String resetTokenStr = jwtService.generateToken(claims, email);
 
-        passwordResetTokenRepository.deleteByEmail(email); // delete old ones
+        passwordResetTokenRepository.deleteByEmail(email);
         PasswordResetToken resetToken = new PasswordResetToken(
                 resetTokenStr,
                 email,
-                LocalDateTime.now().plusMinutes(15) // expires in 15 mins
+                LocalDateTime.now().plusMinutes(15)
         );
         passwordResetTokenRepository.save(resetToken);
 
@@ -246,6 +302,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
 
         resetToken.setUsed(true);
@@ -266,7 +323,7 @@ public class UserService {
                 user.isActive(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getPhoneNumber(),
+                user.getPhone() != null ? user.getPhone() : user.getPhoneNumber(),
                 user.getBio(),
                 user.getProfileImageUrl()
         );
@@ -279,11 +336,14 @@ public class UserService {
         user.setFirstName(updateDto.getFirstName());
         user.setLastName(updateDto.getLastName());
         user.setFullName((updateDto.getFirstName() + " " + updateDto.getLastName()).trim());
-        user.setPhoneNumber(updateDto.getPhoneNumber());
+        user.setPhone(updateDto.getPhoneNumber());
         user.setBio(updateDto.getBio());
         if (updateDto.getProfileImageUrl() != null) {
             user.setProfileImageUrl(updateDto.getProfileImageUrl());
         }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        profileCompletionService.calculateCompletionForUser(user);
 
         User savedUser = userRepository.save(user);
 
@@ -297,7 +357,7 @@ public class UserService {
                 savedUser.isActive(),
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
-                savedUser.getPhoneNumber(),
+                savedUser.getPhone() != null ? savedUser.getPhone() : savedUser.getPhoneNumber(),
                 savedUser.getBio(),
                 savedUser.getProfileImageUrl()
         );
@@ -312,6 +372,7 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
     }
 }

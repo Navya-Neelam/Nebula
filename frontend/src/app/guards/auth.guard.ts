@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  const hasToken = !!sessionStorage.getItem('token');
+  const hasToken = !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
 
   if (hasToken) {
     return true;
@@ -16,7 +16,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 export const guestGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  const hasToken = !!sessionStorage.getItem('token');
+  const hasToken = !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
 
   if (hasToken) {
     router.navigate(['/dashboard']);

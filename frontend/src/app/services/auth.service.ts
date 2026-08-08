@@ -43,9 +43,22 @@ export class AuthService {
   userRole = computed(() => this.currentUser()?.role || null);
 
   constructor() {
-    if (sessionStorage.getItem('token')) {
+    // Restore cached user synchronously so route guards don't fail during reload
+    const storedUserStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (storedUserStr) {
+      try {
+        this.currentUser.set(JSON.parse(storedUserStr));
+      } catch (e) {}
+    }
+
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
       this.loadUserProfile().subscribe({
-        error: () => this.logout()
+        error: (err) => {
+          if (err.status === 401 || err.status === 403) {
+            this.logout();
+          }
+        }
       });
     }
   }
@@ -77,11 +90,13 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthResponse> {
-    const refreshToken = sessionStorage.getItem('refreshToken') || '';
+    const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken') || '';
     return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, { refreshToken }).pipe(
       tap(res => {
+        localStorage.setItem('token', res.token);
         sessionStorage.setItem('token', res.token);
         if (res.refreshToken) {
+          localStorage.setItem('refreshToken', res.refreshToken);
           sessionStorage.setItem('refreshToken', res.refreshToken);
         }
       })
@@ -90,13 +105,21 @@ export class AuthService {
 
   loadUserProfile(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
-      tap(user => this.currentUser.set(user))
+      tap(user => {
+        this.currentUser.set(user);
+        localStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('user', JSON.stringify(user));
+      })
     );
   }
 
   updateProfile(profileData: any): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/profile`, profileData).pipe(
-      tap(user => this.currentUser.set(user))
+      tap(user => {
+        this.currentUser.set(user);
+        localStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('user', JSON.stringify(user));
+      })
     );
   }
 
@@ -109,17 +132,20 @@ export class AuthService {
       tap(res => {
         const current = this.currentUser();
         if (current) {
-          this.currentUser.set({
+          const updated = {
             ...current,
             profileImageUrl: res.imageUrl
-          });
+          };
+          this.currentUser.set(updated);
+          localStorage.setItem('user', JSON.stringify(updated));
+          sessionStorage.setItem('user', JSON.stringify(updated));
         }
       })
     );
   }
 
   logout() {
-    const refreshToken = sessionStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
     if (refreshToken) {
       this.http.post(`${this.apiUrl}/logout`, { refreshToken }).subscribe({
         next: () => this.clearSessionAndRedirect(),
@@ -131,16 +157,23 @@ export class AuthService {
   }
 
   private clearSessionAndRedirect() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('user');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
   private handleAuthSuccess(res: AuthResponse) {
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('refreshToken', res.refreshToken);
     sessionStorage.setItem('token', res.token);
     sessionStorage.setItem('refreshToken', res.refreshToken);
-    this.currentUser.set({
+
+    const user: User = {
       id: res.id,
       fullName: res.fullName,
       email: res.email,
@@ -148,7 +181,11 @@ export class AuthService {
       role: res.role,
       isVerified: true,
       isActive: true
-    });
+    };
+
+    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('user', JSON.stringify(user));
+    this.currentUser.set(user);
   }
 
   hasRole(roles: string[]): boolean {

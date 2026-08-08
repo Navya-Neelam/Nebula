@@ -23,19 +23,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.nebula.auth.model.CourseEnrollment;
+import com.nebula.auth.repository.CourseEnrollmentRepository;
+
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final CourseEnrollmentRepository enrollmentRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public CourseController(CourseRepository courseRepository, UserRepository userRepository) {
+    public CourseController(CourseRepository courseRepository, UserRepository userRepository, CourseEnrollmentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @GetMapping
@@ -49,7 +54,7 @@ public class CourseController {
             @RequestParam(required = false) String duration,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size
+            @RequestParam(defaultValue = "100") int size
     ) {
         Query query = new Query();
         List<Criteria> criterias = new ArrayList<>();
@@ -225,5 +230,43 @@ public class CourseController {
 
         courseRepository.delete(course);
         return ResponseEntity.ok(Map.of("message", "Course deleted successfully"));
+    }
+
+    @PostMapping("/{id}/enroll")
+    public ResponseEntity<?> enrollInCourse(@PathVariable String id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (enrollmentRepository.existsByUserIdAndCourseId(user.getId(), course.getId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "You are already enrolled in this course"));
+        }
+
+        CourseEnrollment enrollment = new CourseEnrollment(user.getId(), course.getId(), course.getPrice());
+        enrollmentRepository.save(enrollment);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Enrolled successfully", "courseId", course.getId(), "courseTitle", course.getTitle()));
+    }
+
+    @GetMapping("/enrolled")
+    public ResponseEntity<List<Course>> getEnrolledCourses() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<CourseEnrollment> enrollments = enrollmentRepository.findByUserId(user.getId());
+        List<String> courseIds = enrollments.stream().map(CourseEnrollment::getCourseId).toList();
+
+        List<Course> courses = new ArrayList<>();
+        if (!courseIds.isEmpty()) {
+            courses = (List<Course>) courseRepository.findAllById(courseIds);
+        }
+
+        return ResponseEntity.ok(courses);
     }
 }

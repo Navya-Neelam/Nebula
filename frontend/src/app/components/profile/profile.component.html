@@ -228,12 +228,32 @@
       @if (authService.currentUser(); as user) {
         <span class="profile-role-badge">{{ user.role }}</span>
         <h3 style="color: white; font-size: 20px; font-weight: 600; margin-bottom: 6px;">{{ user.fullName }}</h3>
-        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">{{ user.email }}</p>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">{{ user.email }}</p>
       }
 
-      <button (click)="showPasswordDialog.set(true)" class="back-dashboard-btn" style="width: 100%; padding: 12px; font-weight: 600;">
-        Change Password
-      </button>
+      @if (completionInfo(); as completion) {
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Profile Completion</span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--accent-teal);">{{ completion.completionPercentage }}%</span>
+          </div>
+          <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+            <div [style.width.%]="completion.completionPercentage" style="height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal)); transition: width 0.4s ease;"></div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin: 0;">
+            {{ completion.completedFieldsCount }} of {{ completion.totalFieldsCount }} profile details provided
+          </p>
+        </div>
+      }
+
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <button (click)="showPreferencesDialog.set(true)" class="back-dashboard-btn" style="width: 100%; padding: 12px; font-weight: 600; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.3); color: var(--accent-purple);">
+          ⚙️ Account Preferences
+        </button>
+        <button (click)="showPasswordDialog.set(true)" class="back-dashboard-btn" style="width: 100%; padding: 12px; font-weight: 600;">
+          🔒 Change Password
+        </button>
+      </div>
     </section>
 
     <!-- Right Column: Settings Form -->
@@ -353,6 +373,68 @@
               <div class="spinner"></div>
             } @else {
               Update
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- User Preferences Modal Dialog -->
+@if (showPreferencesDialog()) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="color: white; font-size: 20px; font-weight: 700; margin-bottom: 20px;">User Preferences</h3>
+
+      <form [formGroup]="prefForm" (ngSubmit)="onSavePreferences()">
+        <!-- Theme -->
+        <div class="form-group">
+          <label class="form-label">Application Theme</label>
+          <select formControlName="theme" class="form-input" style="background: rgba(17, 24, 39, 0.9);">
+            <option value="DARK">Nebula Dark Mode</option>
+            <option value="LIGHT">Solar Light Mode</option>
+            <option value="SYSTEM">System Preference</option>
+          </select>
+        </div>
+
+        <!-- Language -->
+        <div class="form-group">
+          <label class="form-label">Preferred Language</label>
+          <select formControlName="language" class="form-input" style="background: rgba(17, 24, 39, 0.9);">
+            <option value="en">English (US)</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+
+        <!-- Timezone -->
+        <div class="form-group">
+          <label class="form-label">Timezone</label>
+          <input formControlName="timeZone" class="form-input" placeholder="UTC / America/New_York" />
+        </div>
+
+        <!-- Notifications -->
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px;">
+          <label style="font-size: 14px; color: var(--text-primary);">Email Notifications</label>
+          <input type="checkbox" formControlName="emailNotifications" style="width: 18px; height: 18px; accent-color: var(--accent-purple);" />
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+          <label style="font-size: 14px; color: var(--text-primary);">Marketing Emails</label>
+          <input type="checkbox" formControlName="marketingEmails" style="width: 18px; height: 18px; accent-color: var(--accent-purple);" />
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="button" (click)="showPreferencesDialog.set(false)" class="back-dashboard-btn" style="flex: 1; text-align: center; border-radius: 12px; padding: 12px;">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" style="flex: 1; box-shadow: none;" [disabled]="isSavingPreferences()">
+            @if (isSavingPreferences()) {
+              <div class="spinner"></div>
+            } @else {
+              Save Preferences
             }
           </button>
         </div>

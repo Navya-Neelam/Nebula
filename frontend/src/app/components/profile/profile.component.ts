@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
+import { PreferencesService, ProfileCompletionDTO, UserPreferencesDTO } from '../../services/preferences.service';
 
 @Component({
   selector: 'app-profile',
@@ -12,6 +13,7 @@ import { AuthService, User } from '../../services/auth.service';
 })
 export class ProfileComponent implements OnInit {
   authService = inject(AuthService);
+  private prefService = inject(PreferencesService);
   private fb = inject(FormBuilder);
 
   profileForm = this.fb.group({
@@ -27,9 +29,18 @@ export class ProfileComponent implements OnInit {
     confirmPassword: ['', [Validators.required]]
   });
 
+  prefForm = this.fb.group({
+    theme: ['DARK'],
+    language: ['en'],
+    timeZone: ['UTC'],
+    emailNotifications: [true],
+    marketingEmails: [false]
+  });
+
   isSavingProfile = signal(false);
   isChangingPassword = signal(false);
   isUploadingImage = signal(false);
+  isSavingPreferences = signal(false);
 
   profileMessage = signal<string | null>(null);
   profileError = signal<string | null>(null);
@@ -38,7 +49,11 @@ export class ProfileComponent implements OnInit {
   passwordError = signal<string | null>(null);
 
   showPasswordDialog = signal(false);
+  showPreferencesDialog = signal(false);
   imagePreview = signal<string | null>(null);
+
+  completionInfo = signal<ProfileCompletionDTO | null>(null);
+  userPreferences = signal<UserPreferencesDTO | null>(null);
 
   ngOnInit() {
     this.authService.loadUserProfile().subscribe({
@@ -52,6 +67,51 @@ export class ProfileComponent implements OnInit {
         if (user.profileImageUrl) {
           this.imagePreview.set(user.profileImageUrl);
         }
+      }
+    });
+
+    this.loadCompletion();
+    this.loadPreferences();
+  }
+
+  loadCompletion() {
+    this.prefService.getProfileCompletion().subscribe({
+      next: (data) => this.completionInfo.set(data),
+      error: () => {}
+    });
+  }
+
+  loadPreferences() {
+    this.prefService.getPreferences().subscribe({
+      next: (data) => {
+        this.userPreferences.set(data);
+        this.prefForm.patchValue({
+          theme: data.theme || 'DARK',
+          language: data.language || 'en',
+          timeZone: data.timeZone || 'UTC',
+          emailNotifications: data.emailNotifications ?? true,
+          marketingEmails: data.marketingEmails ?? false
+        });
+      },
+      error: () => {}
+    });
+  }
+
+  onSavePreferences() {
+    this.isSavingPreferences.set(true);
+    const dto: UserPreferencesDTO = this.prefForm.value as any;
+    this.prefService.updatePreferences(dto).subscribe({
+      next: (updated) => {
+        this.isSavingPreferences.set(false);
+        this.userPreferences.set(updated);
+        this.showPreferencesDialog.set(false);
+        this.profileMessage.set('Preferences updated successfully!');
+        this.loadCompletion();
+        setTimeout(() => this.profileMessage.set(null), 3500);
+      },
+      error: () => {
+        this.isSavingPreferences.set(false);
+        this.profileError.set('Failed to save preferences.');
       }
     });
   }
@@ -71,6 +131,7 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.isSavingProfile.set(false);
         this.profileMessage.set('Profile updated successfully!');
+        this.loadCompletion();
         setTimeout(() => this.profileMessage.set(null), 3500);
       },
       error: (err) => {

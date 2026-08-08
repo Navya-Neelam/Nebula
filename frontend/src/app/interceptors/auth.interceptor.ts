@@ -8,7 +8,7 @@ const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   let authReq = req;
   if (token) {

@@ -1,0 +1,68 @@
+<div class="nebula-bg">
+  <div class="nebula-blob blob-purple"></div>
+  <div class="nebula-blob blob-teal"></div>
+  <div class="nebula-blob blob-pink"></div>
+</div>
+
+<div class="route-wrapper">
+  <div class="glass-card welcome-card animate-fade-in">
+    <!-- Success Badge -->
+    <div class="badge-icon-wrapper">
+      <div class="badge-pulse"></div>
+      <div class="badge-icon">🎉</div>
+    </div>
+
+    <!-- Title & Greeting -->
+    <h2 class="welcome-title">Welcome, {{ firstName() }}!</h2>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      Registration Successful
+    </div>
+
+    <!-- Onboarding Message -->
+    <p class="welcome-message">
+      Your account and preferences have been set up successfully. We sent a verification link to your email address. Check your inbox to verify your email and unlock all features.
+    </p>
+
+    <!-- Profile Completion Box -->
+    <div class="completion-box">
+      <div class="completion-header">
+        <span class="completion-title">Profile Completion Status</span>
+        <span class="completion-percent">{{ completionData()?.completionPercentage || 70 }}%</span>
+      </div>
+
+      <!-- Animated Progress Bar -->
+      <div class="progress-bar-track">
+        <div 
+          class="progress-bar-fill" 
+          [style.width.%]="completionData()?.completionPercentage || 70"
+        ></div>
+      </div>
+
+      <!-- Completed Items List -->
+      <div class="completion-checklist">
+        @if (completionData()?.completedItems; as items) {
+          @for (item of items; track item) {
+            <div class="checklist-item done">
+              <span class="check-icon">✓</span>
+              <span>{{ item }}</span>
+            </div>
+          }
+        }
+        @if (completionData()?.pendingItems; as pending) {
+          @for (item of pending; track item) {
+            <div class="checklist-item pending">
+              <span class="pending-icon">○</span>
+              <span>{{ item }} (Pending)</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Let's Get Started Action Button -->
+    <button type="button" class="btn-primary get-started-btn" (click)="onGetStarted()">
+      Let's Get Started 🚀
+    </button>
+  </div>
+</div>

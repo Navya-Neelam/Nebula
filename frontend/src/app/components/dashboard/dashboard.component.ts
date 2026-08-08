@@ -265,6 +265,281 @@ export class DashboardComponent implements OnInit {
       instructor: "Brian Dean",
       detailDescription: "Boost organic search engine rankings and visitor retention. Learn to perform search intent keyword research, write titles that get clicks, structure layout headings, and build natural backlink relationships.",
       price: 29.99
+    },
+    {
+      title: "Autonomous AI Agents & Multi-Agent Frameworks",
+      description: "Build autonomous agent networks with AutoGen, CrewAI, and LangGraph.",
+      imageUrl: "https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=60",
+      category: "Generative AI",
+      duration: "14 hours",
+      rating: 4.9,
+      instructor: "Alex Rivera",
+      detailDescription: "Architect state-of-the-art multi-agent AI applications. Learn how autonomous agents plan tasks, tool usage, memory integration, and agent orchestration with LangGraph and CrewAI.",
+      price: 89.99
+    },
+    {
+      title: "LLM Fine-Tuning & Quantization Masterclass",
+      description: "Learn LoRA, QLoRA, HuggingFace Transformers, and vLLM deployment.",
+      imageUrl: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&auto=format&fit=crop&q=60",
+      category: "Generative AI",
+      duration: "18 hours",
+      rating: 4.9,
+      instructor: "Dr. Clara Sterling",
+      detailDescription: "Fine-tune open-source models like Llama 3 and Mistral on domain datasets using Parameter-Efficient Fine-Tuning (PEFT), LoRA, and QLoRA. Deploy quantized models with vLLM for low-latency inferencing.",
+      price: 109.99
+    },
+    {
+      title: "RAG Engineering & Vector Databases",
+      description: "Build production Retrieval-Augmented Generation systems with Pinecone, Qdrant, and LlamaIndex.",
+      imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60",
+      category: "Generative AI",
+      duration: "12 hours",
+      rating: 4.8,
+      instructor: "Dr. Clara Sterling",
+      detailDescription: "Master RAG architectures. Learn document chunking strategies, embedding models, vector similarity indexing with Pinecone and Qdrant, hybrid search, re-ranking, and evaluate RAG accuracy using Ragas.",
+      price: 79.99
+    },
+    {
+      title: "Multimodal AI & Vision Language Models",
+      description: "Harness GPT-4 Vision, Claude 3, and Whisper for multimodal AI products.",
+      imageUrl: "https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=800&auto=format&fit=crop&q=60",
+      category: "Generative AI",
+      duration: "16 hours",
+      rating: 4.8,
+      instructor: "Sophia Chen",
+      detailDescription: "Build applications that see, hear, and converse. Integrate vision language models, automatic speech recognition with OpenAI Whisper, and generative image/video synthesis APIs.",
+      price: 94.99
+    },
+    {
+      title: "Data Engineering & Analytics with Snowflake & dbt",
+      description: "Build modern cloud data warehouses and ETL pipelines with dbt.",
+      imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60",
+      category: "Data Science",
+      duration: "22 hours",
+      rating: 4.8,
+      instructor: "Prof. Marcus Vance",
+      detailDescription: "Master modern data stack engineering. Design dimensional data models in Snowflake, write SQL transformations using dbt, orchestrate data runs with Airflow, and enforce data quality testing.",
+      price: 119.99
+    },
+    {
+      title: "MLOps & ML Infrastructure with MLflow & Kubeflow",
+      description: "Deploy, monitor, and scale machine learning models in production.",
+      imageUrl: "https://images.unsplash.com/photo-1527474305487-b87b222841cc?w=800&auto=format&fit=crop&q=60",
+      category: "Data Science",
+      duration: "26 hours",
+      rating: 4.9,
+      instructor: "Dr. Sophia Chen",
+      detailDescription: "Bridge the gap between data science and DevOps. Implement experiment tracking with MLflow, model registries, CI/CD pipelines for ML models, feature stores, and drift monitoring.",
+      price: 129.99
+    },
+    {
+      title: "Big Data Processing with Apache Spark & Databricks",
+      description: "Process terabytes of streaming and batch data using PySpark.",
+      imageUrl: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&auto=format&fit=crop&q=60",
+      category: "Data Science",
+      duration: "30 hours",
+      rating: 4.7,
+      instructor: "Prof. Marcus Vance",
+      detailDescription: "Learn large-scale distributed data processing. Write PySpark batch transformations, structured streaming queries, Delta Lake lakehouse architectures, and run distributed ML algorithms on Databricks clusters.",
+      price: 139.99
+    },
+    {
+      title: "Next.js 14 & React 19 Full-Stack Architecture",
+      description: "Master Server Components, Server Actions, App Router, and Prisma.",
+      imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+      category: "Web Development",
+      duration: "28 hours",
+      rating: 4.9,
+      instructor: "Maximilian Schwarz",
+      detailDescription: "Build modern, lightning-fast full-stack web apps using Next.js 14 App Router. Learn React Server Components, Server Actions for seamless mutations, Tailwind styling, Auth.js, and Prisma ORM.",
+      price: 109.99
+    },
+    {
+      title: "Vue 3 & Nuxt 3 Full-Stack Enterprise Guide",
+      description: "Build reactive web apps with Composition API, Pinia, and Nuxt 3.",
+      imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
+      category: "Web Development",
+      duration: "20 hours",
+      rating: 4.8,
+      instructor: "Sarah Drasner",
+      detailDescription: "Master Vue 3's script setup and Composition API. Build server-side rendered (SSR) web applications using Nuxt 3, manage global reactive state with Pinia, and deploy to Vercel.",
+      price: 89.99
+    },
+    {
+      title: "Microfrontends Architecture & Module Federation",
+      description: "Architect scalable enterprise frontend systems using Webpack 5.",
+      imageUrl: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=800&auto=format&fit=crop&q=60",
+      category: "Web Development",
+      duration: "18 hours",
+      rating: 4.7,
+      instructor: "Dan Walter",
+      detailDescription: "Decompose monolithic frontend applications into independently deployable microfrontends using Webpack 5 Module Federation, Single-SPA framework, and shared component design libraries.",
+      price: 99.99
+    },
+    {
+      title: "Tailwind CSS & Modern UI Animation Masterclass",
+      description: "Create wowed interfaces with Tailwind, Framer Motion, and Three.js.",
+      imageUrl: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=800&auto=format&fit=crop&q=60",
+      category: "Web Development",
+      duration: "14 hours",
+      rating: 4.8,
+      instructor: "Sarah Drasner",
+      detailDescription: "Craft futuristic, interactive web experiences. Learn Tailwind utility techniques, glassmorphism layouts, micro-interactions, layout transitions with Framer Motion, and 3D web graphics with Three.js.",
+      price: 49.99
+    },
+    {
+      title: "Rust Systems & Backend Engineering",
+      description: "Build high-performance, memory-safe web services using Axum, Actix, and Tokio.",
+      imageUrl: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=800&auto=format&fit=crop&q=60",
+      category: "Backend Development",
+      duration: "26 hours",
+      rating: 4.9,
+      instructor: "Ken Thompson",
+      detailDescription: "Master Rust's memory safety guarantees, ownership, and borrowing. Build blazingly fast asynchronous HTTP APIs using Axum and Tokio, interface with PostgreSQL via SQLx, and write zero-cost abstractions.",
+      price: 119.99
+    },
+    {
+      title: "GraphQL API Development with Node & Spring",
+      description: "Design schema-first GraphQL APIs with Federation and Apollo Server.",
+      imageUrl: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&auto=format&fit=crop&q=60",
+      category: "Backend Development",
+      duration: "18 hours",
+      rating: 4.8,
+      instructor: "Sarah Connor",
+      detailDescription: "Learn GraphQL schema definitions, query resolvers, mutations, subscriptions, N+1 query batching with DataLoader, and federated GraphQL microservice architectures.",
+      price: 79.99
+    },
+    {
+      title: "Event-Driven Microservices with Apache Kafka",
+      description: "Build distributed streaming pipelines and saga pattern architecture.",
+      imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+      category: "Backend Development",
+      duration: "30 hours",
+      rating: 4.9,
+      instructor: "Dr. John Doe",
+      detailDescription: "Architect resilient event-driven microservices. Master Kafka topics, partitions, consumer groups, Kafka Streams API, Schema Registry with Avro, and implement Saga pattern distributed transactions.",
+      price: 129.99
+    },
+    {
+      title: "Redis Caching & In-Memory Data Store Architecture",
+      description: "Master Redis enterprise caching, Pub/Sub, and Rate Limiting.",
+      imageUrl: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&auto=format&fit=crop&q=60",
+      category: "Backend Development",
+      duration: "12 hours",
+      rating: 4.7,
+      instructor: "Ken Thompson",
+      detailDescription: "Optimize application performance with Redis. Implement cache-aside strategies, cache invalidation rules, distributed locking with Redlock, rate limiting, and real-time pub/sub channels.",
+      price: 69.99
+    },
+    {
+      title: "Terraform & Infrastructure as Code (IaC)",
+      description: "Automate multi-cloud AWS, Azure, and GCP deployments using Terraform.",
+      imageUrl: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=60",
+      category: "Cloud Computing",
+      duration: "20 hours",
+      rating: 4.8,
+      instructor: "Nigel Poulton",
+      detailDescription: "Automate cloud provisioning. Write reusable Terraform modules, manage remote state in S3 with DynamoDB locking, manage secrets, and configure CI/CD infrastructure deployments.",
+      price: 89.99
+    },
+    {
+      title: "Microsoft Azure Solutions Architect Bootcamp",
+      description: "Master Azure Virtual Machines, AKS, Blob Storage, and Entra ID.",
+      imageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=60",
+      category: "Cloud Computing",
+      duration: "28 hours",
+      rating: 4.8,
+      instructor: "Stephane Maarek",
+      detailDescription: "Pass the Azure Solutions Architect Expert exam (AZ-305). Design hybrid cloud compute solutions, configure Azure Kubernetes Service (AKS), manage Azure SQL databases, and enforce IAM via Entra ID.",
+      price: 119.99
+    },
+    {
+      title: "Google Cloud Platform (GCP) Professional Engineer",
+      description: "Design scalable cloud infrastructure on GCP Compute Engine & GKE.",
+      imageUrl: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=60",
+      category: "Cloud Computing",
+      duration: "26 hours",
+      rating: 4.8,
+      instructor: "Stephane Maarek",
+      detailDescription: "Master GCP core services. Build containerized cloud workloads using Google Kubernetes Engine (GKE), BigQuery data warehouses, Cloud Functions serverless execution, and VPC networking.",
+      price: 129.99
+    },
+    {
+      title: "Kubernetes Security & Hardening (CKS)",
+      description: "Secure production Kubernetes clusters, RBAC, network policies, and Falco.",
+      imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&auto=format&fit=crop&q=60",
+      category: "Cloud Computing",
+      duration: "22 hours",
+      rating: 4.9,
+      instructor: "Nigel Poulton",
+      detailDescription: "Prepare for the Certified Kubernetes Security Specialist (CKS) exam. Learn cluster hardening, network policies, Pod security standards, container image vulnerability scanning, and runtime threat detection with Falco.",
+      price: 99.99
+    },
+    {
+      title: "Cloud Security & DevSecOps Engineering",
+      description: "Integrate security into CI/CD pipelines, static analysis, and container scanning.",
+      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=60",
+      category: "Cybersecurity",
+      duration: "20 hours",
+      rating: 4.8,
+      instructor: "Sarah Jenkins",
+      detailDescription: "Automate security checks across software development lifecycles. Implement SAST with SonarQube, DAST scanning with OWASP ZAP, dependency audit tools, and container image signing.",
+      price: 99.99
+    },
+    {
+      title: "CompTIA Security+ (SY0-701) Certification",
+      description: "Master network security, risk management, incident response, and SOC ops.",
+      imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&auto=format&fit=crop&q=60",
+      category: "Cybersecurity",
+      duration: "24 hours",
+      rating: 4.7,
+      instructor: "Daniel Lowrie",
+      detailDescription: "Comprehensive prep for the Security+ certification exam. Learn core cybersecurity principles, threat actor profiles, cryptographic protocols, security architecture, and SOC incident triage.",
+      price: 79.99
+    },
+    {
+      title: "API Hacking & OWASP API Security Top 10",
+      description: "Test and secure REST, GraphQL, and gRPC APIs against zero-day exploits.",
+      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=60",
+      category: "Cybersecurity",
+      duration: "18 hours",
+      rating: 4.9,
+      instructor: "Daniel Lowrie",
+      detailDescription: "Identify and fix API security flaws. Master hands-on penetration testing techniques for Broken Object Level Authorization (BOLA), mass assignment, rate limit bypasses, and JWT signature forgery.",
+      price: 89.99
+    },
+    {
+      title: "Flutter & Dart Cross-Platform Mobile Apps",
+      description: "Build iOS, Android, and Web apps from a single codebase with Riverpod.",
+      imageUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&auto=format&fit=crop&q=60",
+      category: "Mobile Development",
+      duration: "30 hours",
+      rating: 4.8,
+      instructor: "Angela Yu",
+      detailDescription: "Master Google's Flutter framework. Build responsive widget trees, handle state management using Riverpod, integrate Firebase backend services, and publish apps to Apple App Store & Google Play.",
+      price: 89.99
+    },
+    {
+      title: "React Native & Expo Full-Stack Mastery",
+      description: "Build cross-platform native mobile apps with Expo Router and NativeWind.",
+      imageUrl: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&auto=format&fit=crop&q=60",
+      category: "Mobile Development",
+      duration: "26 hours",
+      rating: 4.8,
+      instructor: "Philipp Lackner",
+      detailDescription: "Build mobile apps with JavaScript/TypeScript and React skills. Master Expo file-based routing, native hardware integration (camera, push notifications), and Tailwind styling with NativeWind.",
+      price: 99.99
+    },
+    {
+      title: "AI-Powered Content Marketing & Copywriting",
+      description: "Leverage ChatGPT, Midjourney, and Jasper to scale growth marketing.",
+      imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+      category: "Digital Marketing",
+      duration: "12 hours",
+      rating: 4.7,
+      instructor: "Ryan Deiss",
+      detailDescription: "Transform digital marketing workflows with generative AI tools. Learn prompt techniques for high-converting sales copy, social media automation workflows, and AI graphic asset creation.",
+      price: 49.99
     }
   ];
 
@@ -282,7 +557,7 @@ export class DashboardComponent implements OnInit {
   ];
 
   // Pagination constant
-  readonly itemsPerPage = 3;
+  readonly itemsPerPage = 6;
 
   // Computed properties
   filteredCourses = computed(() => {
@@ -323,11 +598,24 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.fetchCourses();
+    this.fetchEnrolledCourses();
+  }
+
+  fetchEnrolledCourses() {
+    if (this.authService.isAuthenticated()) {
+      this.courseService.getEnrolledCourses().subscribe({
+        next: (enrolledList) => {
+          const titles = enrolledList.map(c => c.title);
+          this.enrolledCourseTitles.set(titles);
+        },
+        error: () => {}
+      });
+    }
   }
 
   fetchCourses() {
     this.isLoading.set(true);
-    this.courseService.getCourses().subscribe({
+    this.courseService.getCourses({ size: 100 }).subscribe({
       next: (res) => {
         const courseList = res?.courses || [];
         if (courseList && courseList.length > 0) {
@@ -410,13 +698,30 @@ export class DashboardComponent implements OnInit {
 
     this.isPaying.set(true);
 
-    // Mock payment gateway delay
-    setTimeout(() => {
-      this.enrolledCourseTitles.update(titles => [...titles, course.title]);
-      this.showToast(`🎉 Purchase Successful! Enrolled in "${course.title}".`);
-      this.closeCheckout();
-      this.closeCourseDetails();
-    }, 2000);
+    if (course.id) {
+      this.courseService.enrollInCourse(course.id).subscribe({
+        next: () => {
+          this.enrolledCourseTitles.update(titles => [...titles, course.title]);
+          this.showToast(`🎉 Purchase Successful! Enrolled in "${course.title}".`);
+          this.closeCheckout();
+          this.closeCourseDetails();
+        },
+        error: (err) => {
+          // If already enrolled or offline fallback
+          this.enrolledCourseTitles.update(titles => [...titles, course.title]);
+          this.showToast(`🎉 Enrolled in "${course.title}".`);
+          this.closeCheckout();
+          this.closeCourseDetails();
+        }
+      });
+    } else {
+      setTimeout(() => {
+        this.enrolledCourseTitles.update(titles => [...titles, course.title]);
+        this.showToast(`🎉 Purchase Successful! Enrolled in "${course.title}".`);
+        this.closeCheckout();
+        this.closeCourseDetails();
+      }, 1500);
+    }
   }
 
   addToCart(course: Course) {

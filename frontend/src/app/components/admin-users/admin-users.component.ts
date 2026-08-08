@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { AuthService, User } from '../../services/auth.service';
+import { AuthService, User, UserRole } from '../../services/auth.service';
 
 @Component({
   selector: 'app-admin-users',
@@ -15,11 +15,32 @@ export class AdminUsersComponent implements OnInit {
   authService = inject(AuthService);
 
   users = signal<User[]>([]);
+  searchQuery = signal<string>('');
+  selectedRoleFilter = signal<string>('ALL');
   isLoading = signal(true);
   toastMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
 
   private apiUrl = 'http://localhost:8080/api/auth/users';
+
+  filteredUsers = computed(() => {
+    let list = this.users();
+    const query = this.searchQuery().toLowerCase().trim();
+    const roleFilter = this.selectedRoleFilter();
+
+    if (roleFilter !== 'ALL') {
+      list = list.filter(u => u.role === roleFilter);
+    }
+
+    if (query) {
+      list = list.filter(u =>
+        u.fullName?.toLowerCase().includes(query) ||
+        u.email?.toLowerCase().includes(query)
+      );
+    }
+
+    return list;
+  });
 
   ngOnInit() {
     this.fetchUsers();
@@ -35,6 +56,35 @@ export class AdminUsersComponent implements OnInit {
       error: (err) => {
         this.errorMessage.set(err.error?.message || 'Failed to load users.');
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  onSearchChange(event: Event) {
+    const val = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(val);
+  }
+
+  onRoleFilterChange(event: Event) {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedRoleFilter.set(val);
+  }
+
+  updateUserRole(user: User, event: Event) {
+    const newRole = (event.target as HTMLSelectElement).value as UserRole;
+    if (!newRole || newRole === user.role) return;
+
+    this.http.put(`${this.apiUrl}/${user.id}/role`, { role: newRole }).subscribe({
+      next: () => {
+        this.users.update(allUsers =>
+          allUsers.map(u => u.id === user.id ? { ...u, role: newRole } : u)
+        );
+        this.showToast(`User "${user.fullName}" role updated to ${newRole}.`);
+      },
+      error: (err) => {
+        this.showToast(err.error?.message || 'Failed to update user role.');
+        // Refresh to reset UI dropdown state if error occurred
+        this.fetchUsers();
       }
     });
   }

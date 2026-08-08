@@ -1,5 +1,6 @@
 package com.nebula.auth.model;
 
+import com.nebula.auth.dto.ProfileCompletionDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,6 +21,7 @@ public class User {
     private String password;
 
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // Feature 1: Role-Based Access Control
     private String role = "STUDENT";
@@ -30,12 +32,27 @@ public class User {
     // Feature 1: Admin Deactivate users
     private boolean isActive = true;
 
-    // Feature 5: Profile Details
+    // Profile & Onboarding Details
     private String firstName;
     private String lastName;
-    private String phoneNumber;
+    private String phone;
+    private String country;
+    private String timezone;
     private String bio;
     private String profileImageUrl;
+
+    // Advanced Login Details
+    private boolean rememberMeEnabled = false;
+    private LocalDateTime lastLogin;
+    private String lastLoginIp;
+    private String lastLoginDevice;
+    private String lastLoginBrowser;
+    private String oauthProvider; // GOOGLE, GITHUB, LOCAL
+    private String loginMethod;   // PASSWORD, OTP, GOOGLE, GITHUB
+
+    private OnboardingStatus onboardingStatus;
+    private ProfileCompletionDTO profileCompletion;
+    private UserPreferences userPreferences;
 
     public User() {
     }
@@ -45,6 +62,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
+        this.updatedAt = createdAt;
         this.role = "STUDENT";
         this.isVerified = false;
         this.isActive = true;
@@ -91,6 +109,14 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public String getRole() {
         return role;
     }
@@ -131,12 +157,37 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    // Backward compatibility for phoneNumber
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phone;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phone = phoneNumber;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 
     public String getBio() {
@@ -153,5 +204,85 @@ public class User {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public boolean isRememberMeEnabled() {
+        return rememberMeEnabled;
+    }
+
+    public void setRememberMeEnabled(boolean rememberMeEnabled) {
+        this.rememberMeEnabled = rememberMeEnabled;
+    }
+
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+
+    public void setLastLoginIp(String lastLoginIp) {
+        this.lastLoginIp = lastLoginIp;
+    }
+
+    public String getLastLoginDevice() {
+        return lastLoginDevice;
+    }
+
+    public void setLastLoginDevice(String lastLoginDevice) {
+        this.lastLoginDevice = lastLoginDevice;
+    }
+
+    public String getLastLoginBrowser() {
+        return lastLoginBrowser;
+    }
+
+    public void setLastLoginBrowser(String lastLoginBrowser) {
+        this.lastLoginBrowser = lastLoginBrowser;
+    }
+
+    public String getOauthProvider() {
+        return oauthProvider;
+    }
+
+    public void setOauthProvider(String oauthProvider) {
+        this.oauthProvider = oauthProvider;
+    }
+
+    public String getLoginMethod() {
+        return loginMethod;
+    }
+
+    public void setLoginMethod(String loginMethod) {
+        this.loginMethod = loginMethod;
+    }
+
+    public OnboardingStatus getOnboardingStatus() {
+        return onboardingStatus;
+    }
+
+    public void setOnboardingStatus(OnboardingStatus onboardingStatus) {
+        this.onboardingStatus = onboardingStatus;
+    }
+
+    public ProfileCompletionDTO getProfileCompletion() {
+        return profileCompletion;
+    }
+
+    public void setProfileCompletion(ProfileCompletionDTO profileCompletion) {
+        this.profileCompletion = profileCompletion;
+    }
+
+    public UserPreferences getUserPreferences() {
+        return userPreferences;
+    }
+
+    public void setUserPreferences(UserPreferences userPreferences) {
+        this.userPreferences = userPreferences;
     }
 }

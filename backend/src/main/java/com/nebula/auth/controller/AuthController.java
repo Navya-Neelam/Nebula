@@ -190,4 +190,18 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "User status updated successfully"));
     }
+
+    @PutMapping("/users/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> updateUserRole(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String role = request.get("role");
+        if (role == null || role.isBlank() || (!role.equals("ADMIN") && !role.equals("INSTRUCTOR") && !role.equals("STUDENT"))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Valid role (ADMIN, INSTRUCTOR, STUDENT) is required"));
+        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "User role updated successfully to " + role));
+    }
 }

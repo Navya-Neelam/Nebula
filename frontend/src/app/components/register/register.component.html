@@ -5,158 +5,502 @@
 </div>
 
 <div class="route-wrapper">
-  <div class="glass-card animate-fade-in">
-    <div style="text-align: center; margin-bottom: 28px;">
-      <h2 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #14b8a6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;">Create Account</h2>
-      <p style="color: var(--text-secondary); font-size: 15px;">Join us and start securing your dashboard.</p>
+  <div class="glass-card stepper-card animate-fade-in">
+    <!-- Header -->
+    <div class="wizard-header">
+      <h2 class="wizard-title">Smart Account Registration</h2>
+      <p class="wizard-subtitle">Complete 5 quick steps to personalize your Nebula Auth experience.</p>
     </div>
 
+    <!-- Stepper Navigation Header -->
+    <div class="stepper-nav">
+      <div 
+        class="step-item" 
+        [class.active]="currentStep() === 1" 
+        [class.completed]="currentStep() > 1 && isStepValid(1)"
+        (click)="goToStep(1)"
+      >
+        <div class="step-badge">
+          @if (currentStep() > 1 && isStepValid(1)) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            1
+          }
+        </div>
+        <span class="step-label">Basic Info</span>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep() > 1"></div>
+
+      <div 
+        class="step-item" 
+        [class.active]="currentStep() === 2" 
+        [class.completed]="currentStep() > 2 && isStepValid(2)"
+        (click)="goToStep(2)"
+      >
+        <div class="step-badge">
+          @if (currentStep() > 2 && isStepValid(2)) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            2
+          }
+        </div>
+        <span class="step-label">Security</span>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep() > 2"></div>
+
+      <div 
+        class="step-item" 
+        [class.active]="currentStep() === 3" 
+        [class.completed]="currentStep() > 3 && isStepValid(3)"
+        (click)="goToStep(3)"
+      >
+        <div class="step-badge">
+          @if (currentStep() > 3 && isStepValid(3)) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            3
+          }
+        </div>
+        <span class="step-label">Contact</span>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep() > 3"></div>
+
+      <div 
+        class="step-item" 
+        [class.active]="currentStep() === 4" 
+        [class.completed]="currentStep() > 4 && isStepValid(4)"
+        (click)="goToStep(4)"
+      >
+        <div class="step-badge">
+          @if (currentStep() > 4 && isStepValid(4)) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            4
+          }
+        </div>
+        <span class="step-label">Preferences</span>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep() > 4"></div>
+
+      <div 
+        class="step-item" 
+        [class.active]="currentStep() === 5" 
+        [class.completed]="currentStep() === 5 && isStepValid(5)"
+        (click)="goToStep(5)"
+      >
+        <div class="step-badge">5</div>
+        <span class="step-label">Review</span>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
     @if (errorMessage()) {
-      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; text-align: center;">
+      <div class="alert-banner error-banner">
         {{ errorMessage() }}
       </div>
     }
 
-    @if (isRegistered()) {
-      <div style="background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.25); color: #2dd4bf; padding: 16px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: center; line-height: 1.5;">
-        🎉 <strong>Registration Successful!</strong><br>
-        We've sent a verification link to your email. Please click the link to verify and activate your account.
+    <!-- STEP 1: Basic Information -->
+    @if (currentStep() === 1) {
+      <div class="step-content animate-fade-in">
+        <h3 class="step-title">Step 1: Basic Information</h3>
+        <form [formGroup]="step1Form">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="firstName" class="form-label">First Name</label>
+              <div class="input-container">
+                <input 
+                  type="text" 
+                  id="firstName" 
+                  formControlName="firstName" 
+                  class="form-input" 
+                  [class.is-invalid]="isFieldInvalid(step1Form, 'firstName')"
+                  placeholder="John"
+                />
+              </div>
+              @if (isFieldInvalid(step1Form, 'firstName')) {
+                <span class="field-error">First name is required</span>
+              }
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="lastName" class="form-label">Last Name</label>
+              <div class="input-container">
+                <input 
+                  type="text" 
+                  id="lastName" 
+                  formControlName="lastName" 
+                  class="form-input" 
+                  [class.is-invalid]="isFieldInvalid(step1Form, 'lastName')"
+                  placeholder="Doe"
+                />
+              </div>
+              @if (isFieldInvalid(step1Form, 'lastName')) {
+                <span class="field-error">Last name is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <div class="input-container">
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email" 
+                class="form-input" 
+                [class.is-invalid]="isFieldInvalid(step1Form, 'email')"
+                placeholder="john.doe@example.com"
+              />
+            </div>
+            @if (isFieldInvalid(step1Form, 'email')) {
+              <span class="field-error">
+                @if (step1Form.get('email')?.errors?.['required']) {
+                  Email is required
+                } @else if (step1Form.get('email')?.errors?.['email']) {
+                  Please enter a valid email address
+                }
+              </span>
+            }
+          </div>
+        </form>
       </div>
     }
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <!-- Full Name Field -->
-      <div class="form-group">
-        <label for="fullName" class="form-label">Full Name</label>
-        <div class="input-container">
-          <input 
-            type="text" 
-            id="fullName" 
-            formControlName="fullName" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('fullName')"
-            placeholder="John Doe"
-          />
-        </div>
-        @if (isFieldInvalid('fullName')) {
-          <span class="field-error">
-            Full name is required
-          </span>
-        }
-      </div>
+    <!-- STEP 2: Password & Security -->
+    @if (currentStep() === 2) {
+      <div class="step-content animate-fade-in">
+        <h3 class="step-title">Step 2: Security & Password</h3>
+        <form [formGroup]="step2Form">
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-container">
+              <input 
+                [type]="showPassword() ? 'text' : 'password'" 
+                id="password" 
+                formControlName="password" 
+                class="form-input" 
+                [class.is-invalid]="isFieldInvalid(step2Form, 'password')"
+                placeholder="••••••••"
+              />
+              <button type="button" class="password-toggle-btn" (click)="togglePassword()" aria-label="Toggle password visibility">
+                @if (showPassword()) {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                }
+              </button>
+            </div>
 
-      <!-- Email Field -->
-      <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
-        <div class="input-container">
-          <input 
-            type="email" 
-            id="email" 
-            formControlName="email" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('email')"
-            placeholder="name@example.com"
-          />
-        </div>
-        @if (isFieldInvalid('email')) {
-          <span class="field-error">
-            @if (registerForm.get('email')?.errors?.['required']) {
-              Email is required
-            } @else if (registerForm.get('email')?.errors?.['email']) {
-              Please enter a valid email address
-            }
-          </span>
-        }
-      </div>
+            <!-- Password Strength Indicator -->
+            <div class="strength-meter">
+              <div class="strength-bar-bg">
+                <div 
+                  class="strength-bar-fill" 
+                  [style.width.%]="passwordStrength().percent"
+                  [style.background-color]="passwordStrength().color"
+                ></div>
+              </div>
+              <div class="strength-label">
+                <span>Strength:</span>
+                <strong [style.color]="passwordStrength().color">{{ passwordStrength().label }}</strong>
+              </div>
+            </div>
 
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-container">
-          <input 
-            [type]="showPassword() ? 'text' : 'password'" 
-            id="password" 
-            formControlName="password" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('password')"
-            placeholder="••••••••"
-          />
-          <button type="button" class="password-toggle-btn" (click)="togglePassword()" aria-label="Toggle password visibility">
-            @if (showPassword()) {
-              <!-- Eye Off SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
-              </svg>
-            } @else {
-              <!-- Eye SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
+            @if (isFieldInvalid(step2Form, 'password')) {
+              <span class="field-error">
+                @if (step2Form.get('password')?.errors?.['required']) {
+                  Password is required
+                } @else if (step2Form.get('password')?.errors?.['minlength']) {
+                  Password must be at least 8 characters
+                } @else if (step2Form.get('password')?.errors?.['pattern']) {
+                  Password must contain at least one number
+                }
+              </span>
             }
-          </button>
-        </div>
-        @if (isFieldInvalid('password')) {
-          <span class="field-error">
-            @if (registerForm.get('password')?.errors?.['required']) {
-              Password is required
-            } @else if (registerForm.get('password')?.errors?.['minlength']) {
-              Password must be at least 8 characters long
-            } @else if (registerForm.get('password')?.errors?.['pattern']) {
-              Password must contain at least one number
-            }
-          </span>
-        }
-      </div>
+          </div>
 
-      <!-- Confirm Password Field -->
-      <div class="form-group">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <div class="input-container">
-          <input 
-            [type]="showConfirmPassword() ? 'text' : 'password'" 
-            id="confirmPassword" 
-            formControlName="confirmPassword" 
-            class="form-input" 
-            [class.is-invalid]="isFieldInvalid('confirmPassword')"
-            placeholder="••••••••"
-          />
-          <button type="button" class="password-toggle-btn" (click)="toggleConfirmPassword()" aria-label="Toggle confirm password visibility">
-            @if (showConfirmPassword()) {
-              <!-- Eye Off SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
-              </svg>
-            } @else {
-              <!-- Eye SVG Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              </svg>
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <div class="input-container">
+              <input 
+                [type]="showConfirmPassword() ? 'text' : 'password'" 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                class="form-input" 
+                [class.is-invalid]="isFieldInvalid(step2Form, 'confirmPassword')"
+                placeholder="••••••••"
+              />
+              <button type="button" class="password-toggle-btn" (click)="toggleConfirmPassword()" aria-label="Toggle confirm password visibility">
+                @if (showConfirmPassword()) {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3a8.2 8.2 0 0 1-5.782 2.397c-1.579 0-3.076-.447-4.354-1.228m0 0L1.934 12" />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (isFieldInvalid(step2Form, 'confirmPassword')) {
+              <span class="field-error">
+                @if (step2Form.get('confirmPassword')?.errors?.['required']) {
+                  Please confirm your password
+                } @else if (step2Form.get('confirmPassword')?.errors?.['passwordMismatch']) {
+                  Passwords do not match
+                }
+              </span>
             }
-          </button>
-        </div>
-        @if (isFieldInvalid('confirmPassword')) {
-          <span class="field-error">
-            @if (registerForm.get('confirmPassword')?.errors?.['required']) {
-              Please confirm your password
-            } @else if (registerForm.get('confirmPassword')?.errors?.['passwordMismatch']) {
-              Passwords do not match
-            }
-          </span>
-        }
+          </div>
+        </form>
       </div>
+    }
 
-      <!-- Submit Button -->
-      <button type="submit" class="btn-primary" [disabled]="isLoading() || registerForm.invalid">
-        @if (isLoading()) {
-          <div class="spinner"></div>
-          Creating Account...
-        } @else {
-          Create Account
-        }
-      </button>
-    </form>
+    <!-- STEP 3: Contact & Location -->
+    @if (currentStep() === 3) {
+      <div class="step-content animate-fade-in">
+        <h3 class="step-title">Step 3: Phone & Location</h3>
+        <form [formGroup]="step3Form">
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <div class="input-container">
+              <input 
+                type="tel" 
+                id="phone" 
+                formControlName="phone" 
+                class="form-input" 
+                [class.is-invalid]="isFieldInvalid(step3Form, 'phone')"
+                placeholder="+1 (555) 000-0000"
+              />
+            </div>
+            @if (isFieldInvalid(step3Form, 'phone')) {
+              <span class="field-error">Please enter a valid phone number</span>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="country" class="form-label">Country</label>
+              <div class="input-container">
+                <select id="country" formControlName="country" class="form-input select-input">
+                  @for (c of countries; track c.code) {
+                    <option [value]="c.code">{{ c.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="timeZone" class="form-label">Time Zone</label>
+              <div class="input-container">
+                <select id="timeZone" formControlName="timeZone" class="form-input select-input">
+                  @for (tz of timezones; track tz) {
+                    <option [value]="tz">{{ tz }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- STEP 4: User Preferences -->
+    @if (currentStep() === 4) {
+      <div class="step-content animate-fade-in">
+        <h3 class="step-title">Step 4: User Preferences</h3>
+        <form [formGroup]="step4Form">
+          <!-- Theme Selection -->
+          <div class="form-group">
+            <label class="form-label">Interface Theme</label>
+            <div class="theme-picker">
+              <div 
+                class="theme-chip" 
+                [class.selected]="step4Form.get('theme')?.value === 'DARK'"
+                (click)="selectTheme('DARK')"
+              >
+                <span class="theme-icon">🌙</span>
+                <span class="theme-name">Dark</span>
+              </div>
+              <div 
+                class="theme-chip" 
+                [class.selected]="step4Form.get('theme')?.value === 'LIGHT'"
+                (click)="selectTheme('LIGHT')"
+              >
+                <span class="theme-icon">☀️</span>
+                <span class="theme-name">Light</span>
+              </div>
+              <div 
+                class="theme-chip" 
+                [class.selected]="step4Form.get('theme')?.value === 'SYSTEM'"
+                (click)="selectTheme('SYSTEM')"
+              >
+                <span class="theme-icon">💻</span>
+                <span class="theme-name">System</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language Select -->
+          <div class="form-group">
+            <label for="language" class="form-label">Preferred Language</label>
+            <div class="input-container">
+              <select id="language" formControlName="language" class="form-input select-input">
+                @for (lang of languages; track lang.code) {
+                  <option [value]="lang.code">{{ lang.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Notification Options -->
+          <div class="checkbox-group-wrapper">
+            <label class="checkbox-container">
+              <input type="checkbox" formControlName="emailNotifications" />
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>Email Notifications</strong>
+                <small>Receive account updates, security alerts, and system notifications.</small>
+              </span>
+            </label>
+
+            <label class="checkbox-container">
+              <input type="checkbox" formControlName="marketingEmails" />
+              <span class="checkmark"></span>
+              <span class="checkbox-text">
+                <strong>Marketing Emails</strong>
+                <small>Receive newsletters, feature announcements, and product tips.</small>
+              </span>
+            </label>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- STEP 5: Review & Submit -->
+    @if (currentStep() === 5) {
+      <div class="step-content animate-fade-in">
+        <h3 class="step-title">Step 5: Review & Submit</h3>
+        <p class="summary-subtitle">Please verify your details before creating your account.</p>
+
+        <div class="review-grid">
+          <!-- Section 1 -->
+          <div class="review-card">
+            <div class="review-card-header">
+              <h4>Basic Information</h4>
+              <button type="button" class="btn-link" (click)="goToStep(1)">Edit</button>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Name:</span>
+              <span class="review-value">{{ step1Form.value.firstName }} {{ step1Form.value.lastName }}</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Email:</span>
+              <span class="review-value">{{ step1Form.value.email }}</span>
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="review-card">
+            <div class="review-card-header">
+              <h4>Security</h4>
+              <button type="button" class="btn-link" (click)="goToStep(2)">Edit</button>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Password:</span>
+              <span class="review-value">••••••••</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Strength:</span>
+              <span class="review-value" [style.color]="passwordStrength().color">{{ passwordStrength().label }}</span>
+            </div>
+          </div>
+
+          <!-- Section 3 -->
+          <div class="review-card">
+            <div class="review-card-header">
+              <h4>Contact & Location</h4>
+              <button type="button" class="btn-link" (click)="goToStep(3)">Edit</button>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Phone:</span>
+              <span class="review-value">{{ step3Form.value.phone }}</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Country:</span>
+              <span class="review-value">{{ step3Form.value.country }}</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Timezone:</span>
+              <span class="review-value">{{ step3Form.value.timeZone }}</span>
+            </div>
+          </div>
+
+          <!-- Section 4 -->
+          <div class="review-card">
+            <div class="review-card-header">
+              <h4>Preferences</h4>
+              <button type="button" class="btn-link" (click)="goToStep(4)">Edit</button>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Theme:</span>
+              <span class="review-value">{{ step4Form.value.theme }}</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Language:</span>
+              <span class="review-value">{{ step4Form.value.language }}</span>
+            </div>
+            <div class="review-row">
+              <span class="review-label">Notifications:</span>
+              <span class="review-value">{{ step4Form.value.emailNotifications ? 'Enabled' : 'Disabled' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Action Buttons -->
+    <div class="wizard-actions">
+      @if (currentStep() > 1) {
+        <button type="button" class="btn-secondary" (click)="prevStep()" [disabled]="isLoading()">
+          Back
+        </button>
+      }
+
+      @if (currentStep() < 5) {
+        <button type="button" class="btn-primary flex-1" (click)="nextStep()" [disabled]="!isStepValid(currentStep())">
+          Next Step →
+        </button>
+      } @else {
+        <button type="button" class="btn-primary flex-1" (click)="onSubmit()" [disabled]="isLoading() || !isStepValid(5)">
+          @if (isLoading()) {
+            <div class="spinner"></div>
+            Creating Account...
+          } @else {
+            Complete Registration & Submit ✨
+          }
+        </button>
+      }
+    </div>
 
     <!-- Footer Links -->
     <div class="auth-footer">

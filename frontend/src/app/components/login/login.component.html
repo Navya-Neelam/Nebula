@@ -76,6 +76,19 @@
         }
       </div>
 
+      <!-- Remember Me & Forgot Password -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; margin-bottom: 24px; font-size: 14px;">
+        <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; user-select: none;">
+          <input 
+            type="checkbox" 
+            formControlName="rememberMe" 
+            style="width: 16px; height: 16px; accent-color: #a855f7; cursor: pointer;"
+          />
+          Remember Me (30 Days)
+        </label>
+        <a routerLink="/forgot-password" class="auth-link">Forgot password?</a>
+      </div>
+
       <!-- Submit Button -->
       <button type="submit" class="btn-primary" [disabled]="isLoading() || loginForm.invalid">
         @if (isLoading()) {
@@ -89,9 +102,6 @@
 
     <!-- Footer Links -->
     <div class="auth-footer">
-      <div style="margin-bottom:8px;">
-        <a routerLink="/forgot-password" class="auth-link">Forgot password?</a>
-      </div>
       Don't have an account? 
       <a routerLink="/register" class="auth-link">Create one</a>
     </div>

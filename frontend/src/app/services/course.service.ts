@@ -74,4 +74,12 @@ export class CourseService {
   deleteCourse(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
+
+  enrollInCourse(courseId: string): Observable<{ message: string; courseId: string; courseTitle: string }> {
+    return this.http.post<{ message: string; courseId: string; courseTitle: string }>(`${this.apiUrl}/${courseId}/enroll`, {});
+  }
+
+  getEnrolledCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(`${this.apiUrl}/enrolled`);
+  }
 }

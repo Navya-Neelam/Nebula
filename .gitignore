@@ -27,6 +27,9 @@ frontend/.angular/
 application-local.properties
 application-local.yml
 application-local.yaml
+backend/src/main/resources/application.yml
+backend/output.txt
+temp-*.json
 *.log
 
 # System Files

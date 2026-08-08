@@ -33,6 +33,10 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
+    path: 'welcome',
+    loadComponent: () => import('./components/welcome/welcome.component').then(m => m.WelcomeComponent)
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]

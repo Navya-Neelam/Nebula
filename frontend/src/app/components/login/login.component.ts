@@ -17,7 +17,8 @@ export class LoginComponent {
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required]],
+    rememberMe: [false]
   });
 
   showPassword = signal(false);
@@ -45,7 +46,7 @@ export class LoginComponent {
       error: (err) => {
         this.isLoading.set(false);
         if (err.status === 401) {
-          this.errorMessage.set('Invalid email or password');
+          this.errorMessage.set(err.error?.message || 'Invalid email or password');
         } else {
           this.errorMessage.set(err.error?.message || 'An unexpected error occurred. Please try again.');
         }
