@@ -221,15 +221,20 @@ public class UserService {
     }
 
     public AuthResponse refresh(String refreshTokenStr) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
                 .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
 
-        if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            refreshTokenRepository.delete(refreshToken);
+        if (oldRefreshToken.isRevoked()) {
+            refreshTokenRepository.deleteByEmail(oldRefreshToken.getEmail());
+            throw new BadCredentialsException("Refresh token has been revoked. Potential reuse attempt detected. Please login again.");
+        }
+
+        if (oldRefreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(oldRefreshToken);
             throw new BadCredentialsException("Refresh token has expired. Please login again.");
         }
 
-        User user = userRepository.findByEmail(refreshToken.getEmail())
+        User user = userRepository.findByEmail(oldRefreshToken.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
 
         if (!user.isActive()) {
@@ -240,11 +245,32 @@ public class UserService {
             throw new BadCredentialsException("Email not verified");
         }
 
+        // --- REFRESH TOKEN ROTATION ---
+        // Delete old token
+        refreshTokenRepository.delete(oldRefreshToken);
+
+        // Issue new rotated refresh token
+        String newRefreshTokenStr = UUID.randomUUID().toString();
+        boolean isRememberMe = oldRefreshToken.isRememberMe();
+        int expiryDays = isRememberMe ? 30 : 7;
+
+        RefreshToken newRefreshToken = new RefreshToken(
+                newRefreshTokenStr,
+                user.getEmail(),
+                LocalDateTime.now().plusDays(expiryDays),
+                oldRefreshToken.getDevice(),
+                oldRefreshToken.getBrowser(),
+                oldRefreshToken.getIpAddress(),
+                isRememberMe
+        );
+        refreshTokenRepository.save(newRefreshToken);
+
+        // Issue new access token
         String newAccessToken = jwtService.generateToken(user.getEmail(), user.getRole());
 
         return new AuthResponse(
                 newAccessToken,
-                refreshTokenStr,
+                newRefreshTokenStr,
                 user.getRole(),
                 user.getId(),
                 user.getFullName(),
