@@ -30,6 +30,34 @@ export interface AuthResponse {
   email: string;
 }
 
+export interface LoginHistoryItem {
+  id: string;
+  userId: string;
+  email: string;
+  ipAddress: string;
+  device: string;
+  browser: string;
+  os?: string;
+  location?: string;
+  loginMethod: string;
+  loginTime: string;
+  status: 'SUCCESS' | 'FAILED';
+  userAgent: string;
+}
+
+export interface ActiveSession {
+  id: string;
+  device: string;
+  browser: string;
+  os?: string;
+  location?: string;
+  ipAddress: string;
+  createdAt: string;
+  expiresAt: string;
+  currentSession: boolean;
+  rememberMe: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -221,5 +249,24 @@ export class AuthService {
     const role = this.userRole();
     if (!role) return false;
     return roles.includes(role);
+  }
+
+  getLoginHistory(): Observable<LoginHistoryItem[]> {
+    return this.http.get<LoginHistoryItem[]>('http://localhost:8080/api/login/history');
+  }
+
+  getCurrentSessions(): Observable<ActiveSession[]> {
+    const refreshToken = sessionStorage.getItem('refreshToken') || localStorage.getItem('refreshToken') || '';
+    return this.http.get<ActiveSession[]>('http://localhost:8080/api/login/current-session', {
+      headers: { 'X-Refresh-Token': refreshToken }
+    });
+  }
+
+  revokeSession(sessionId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`http://localhost:8080/api/login/session/${sessionId}`);
+  }
+
+  revokeAllSessions(): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>('http://localhost:8080/api/login/logout-all');
   }
 }

@@ -1,0 +1,168 @@
+<div class="login-history-container">
+  <!-- Top Navigation Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+      <h1 class="page-title"><i class="bi bi-shield-lock-fill"></i> Login History & Session Management</h1>
+      <p class="page-subtitle">Manage your active sessions and review recent login activity on your account.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="loadData()" [disabled]="isLoadingSessions() || isLoadingHistory()">
+        <i class="bi bi-arrow-clockwise" [class.spin]="isLoadingSessions() || isLoadingHistory()"></i> Refresh
+      </button>
+      <button class="btn btn-danger" (click)="logoutAllSessions()" [disabled]="isRevokingAll() || activeSessions().length === 0">
+        <i class="bi bi-door-closed-fill"></i> Revoke All Active Sessions
+      </button>
+    </div>
+  </div>
+
+  <!-- Action Alert Message -->
+  @if (actionMessage()) {
+    <div class="alert" [class.alert-success]="actionMessage()?.type === 'success'" [class.alert-danger]="actionMessage()?.type === 'error'">
+      <i class="bi" [class.bi-check-circle-fill]="actionMessage()?.type === 'success'" [class.bi-exclamation-triangle-fill]="actionMessage()?.type === 'error'"></i>
+      <span>{{ actionMessage()?.text }}</span>
+    </div>
+  }
+
+  <!-- Section 1: Active Sessions -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2><i class="bi bi-laptop"></i> Active Sessions ({{ activeSessions().length }})</h2>
+      <span class="badge badge-info">Live</span>
+    </div>
+
+    @if (isLoadingSessions()) {
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading active sessions...</p>
+      </div>
+    } @else if (activeSessions().length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-shield-check"></i>
+        <p>No active sessions found.</p>
+      </div>
+    } @else {
+      <div class="sessions-grid">
+        @for (session of activeSessions(); track session.id) {
+          <div class="session-card" [class.current-session-card]="session.currentSession">
+            <div class="session-card-header">
+              <div class="device-info">
+                <div class="device-icon">
+                  <i class="bi" [class]="getDeviceIcon(session.device)"></i>
+                </div>
+                <div>
+                  <h3 class="device-name">{{ session.device || 'Desktop' }}</h3>
+                  <p class="browser-os">{{ session.browser || 'Standard Browser' }} • {{ session.os || 'Unknown OS' }}</p>
+                </div>
+              </div>
+              <div class="badges-row">
+                @if (session.currentSession) {
+                  <span class="badge badge-current"><i class="bi bi-record-circle-fill"></i> Current Session</span>
+                } @else {
+                  <span class="badge badge-active">Active</span>
+                }
+              </div>
+            </div>
+
+            <div class="session-details">
+              <div class="detail-item">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>IP & Location: <strong>{{ session.ipAddress }}</strong> ({{ session.location || 'Local Network' }})</span>
+              </div>
+              <div class="detail-item">
+                <i class="bi bi-clock-fill"></i>
+                <span>Signed in: <strong>{{ session.createdAt | date:'medium' }}</strong></span>
+              </div>
+              @if (session.rememberMe) {
+                <div class="detail-item">
+                  <i class="bi bi-bookmark-check-fill"></i>
+                  <span class="remember-me-text">Remember Me Enabled</span>
+                </div>
+              }
+            </div>
+
+            <div class="session-card-actions">
+              <button class="btn btn-outline-danger btn-sm" 
+                      (click)="revokeSession(session.id)" 
+                      [disabled]="revokingSessionId() === session.id">
+                @if (revokingSessionId() === session.id) {
+                  <span class="spinner-small"></span> Revoking...
+                } @else {
+                  <i class="bi bi-x-circle-fill"></i> Revoke Session
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Section 2: Login History -->
+  <div class="section-card margin-top">
+    <div class="section-header">
+      <h2><i class="bi bi-clock-history"></i> Login History Logs</h2>
+      <span class="history-count">Showing last 20 attempts</span>
+    </div>
+
+    @if (isLoadingHistory()) {
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading login history...</p>
+      </div>
+    } @else if (loginHistory().length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-journal-x"></i>
+        <p>No login history recorded yet.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Device & OS</th>
+              <th>Browser</th>
+              <th>IP & Location</th>
+              <th>Login Method</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of loginHistory(); track log.id || log.loginTime) {
+              <tr [class.failed-row]="log.status === 'FAILED'">
+                <td>
+                  @if (log.status === 'SUCCESS') {
+                    <span class="badge badge-success"><i class="bi bi-check-circle-fill"></i> Success</span>
+                  } @else {
+                    <span class="badge badge-danger"><i class="bi bi-x-circle-fill"></i> Failed</span>
+                  }
+                </td>
+                <td>
+                  <div class="flex-align-gap">
+                    <i class="bi" [class]="getDeviceIcon(log.device)"></i>
+                    <div>
+                      <strong>{{ log.device || 'Desktop' }}</strong>
+                      <div class="text-subtle">{{ log.os || 'Unknown OS' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ log.browser || 'Browser' }}</td>
+                <td>
+                  <div>{{ log.ipAddress }}</div>
+                  <div class="text-subtle">{{ log.location || 'Local Network' }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-method">{{ log.loginMethod || 'PASSWORD' }}</span>
+                </td>
+                <td>{{ log.loginTime | date:'medium' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

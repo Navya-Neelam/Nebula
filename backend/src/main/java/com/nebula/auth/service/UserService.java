@@ -1,5 +1,6 @@
 package com.nebula.auth.service;
 
+import com.nebula.auth.dto.ActiveSessionDTO;
 import com.nebula.auth.dto.AuthResponse;
 import com.nebula.auth.dto.LoginRequest;
 import com.nebula.auth.dto.RegisterRequest;
@@ -8,6 +9,7 @@ import com.nebula.auth.dto.UserResponse;
 import com.nebula.auth.dto.VerifyLoginOtpRequest;
 import com.nebula.auth.exception.EmailAlreadyExistsException;
 import com.nebula.auth.exception.InvalidOtpException;
+import com.nebula.auth.model.LoginHistory;
 import com.nebula.auth.model.OnboardingStatus;
 import com.nebula.auth.model.OtpVerification;
 import com.nebula.auth.model.PasswordResetToken;
@@ -15,12 +17,15 @@ import com.nebula.auth.model.RefreshToken;
 import com.nebula.auth.model.User;
 import com.nebula.auth.model.UserPreferences;
 import com.nebula.auth.model.VerificationToken;
+import com.nebula.auth.repository.LoginHistoryRepository;
 import com.nebula.auth.repository.OtpVerificationRepository;
 import com.nebula.auth.repository.PasswordResetTokenRepository;
 import com.nebula.auth.repository.RefreshTokenRepository;
 import com.nebula.auth.repository.UserRepository;
 import com.nebula.auth.repository.VerificationTokenRepository;
 import com.nebula.auth.security.JwtService;
+import com.nebula.auth.util.UserAgentUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +34,10 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -49,6 +56,9 @@ public class UserService {
 
     @Autowired
     private OtpVerificationRepository otpVerificationRepository;
+
+    @Autowired
+    private LoginHistoryRepository loginHistoryRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -158,10 +168,25 @@ public class UserService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        return login(request, null);
+    }
+
+    public AuthResponse login(LoginRequest request, HttpServletRequest httpRequest) {
+        String userAgent = httpRequest != null ? httpRequest.getHeader("User-Agent") : "";
+        String ipAddress = UserAgentUtils.getClientIp(httpRequest);
+        String browser = UserAgentUtils.extractBrowser(userAgent);
+        String device = UserAgentUtils.extractDevice(userAgent);
+        String os = UserAgentUtils.extractOs(userAgent);
+        String location = UserAgentUtils.extractLocation(ipAddress);
+
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> {
+                    recordFailedLogin(request.getEmail(), ipAddress, device, browser, os, location, "PASSWORD", userAgent);
+                    return new BadCredentialsException("Invalid email or password");
+                });
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            recordFailedLogin(request.getEmail(), ipAddress, device, browser, os, location, "PASSWORD", userAgent);
             throw new BadCredentialsException("Invalid email or password");
         }
 
@@ -175,19 +200,29 @@ public class UserService {
 
         user.setRememberMeEnabled(request.isRememberMe());
         user.setLastLogin(LocalDateTime.now());
+        user.setLastLoginIp(ipAddress);
+        user.setLastLoginDevice(device);
+        user.setLastLoginBrowser(browser);
         user.setLoginMethod("PASSWORD");
         userRepository.save(user);
 
+        LoginHistory history = new LoginHistory(user.getId(), user.getEmail(), ipAddress, device, browser, os, location, "PASSWORD", "SUCCESS", userAgent);
+        loginHistoryRepository.save(history);
+
         String token = jwtService.generateToken(user.getEmail(), user.getRole());
 
-        // Generate refresh token (30 days if rememberMe, 7 days default)
-        refreshTokenRepository.deleteByEmail(user.getEmail()); // delete old ones
         String refreshTokenStr = UUID.randomUUID().toString();
         int expiryDays = request.isRememberMe() ? 30 : 7;
         RefreshToken refreshToken = new RefreshToken(
                 refreshTokenStr,
                 user.getEmail(),
-                LocalDateTime.now().plusDays(expiryDays)
+                LocalDateTime.now().plusDays(expiryDays),
+                device,
+                browser,
+                os,
+                location,
+                ipAddress,
+                request.isRememberMe()
         );
         refreshTokenRepository.save(refreshToken);
 
@@ -199,6 +234,11 @@ public class UserService {
                 user.getFullName(),
                 user.getEmail()
         );
+    }
+
+    private void recordFailedLogin(String email, String ip, String device, String browser, String os, String location, String method, String ua) {
+        LoginHistory history = new LoginHistory(null, email, ip, device, browser, os, location, method, "FAILED", ua);
+        loginHistoryRepository.save(history);
     }
 
     public void verifyEmail(String token) {
@@ -368,6 +408,15 @@ public class UserService {
     }
 
     public AuthResponse verifyLoginOtp(VerifyLoginOtpRequest request) {
+        return verifyLoginOtp(request, null);
+    }
+
+    public AuthResponse verifyLoginOtp(VerifyLoginOtpRequest request, HttpServletRequest httpRequest) {
+        String userAgent = httpRequest != null ? httpRequest.getHeader("User-Agent") : "";
+        String ipAddress = UserAgentUtils.getClientIp(httpRequest);
+        String browser = UserAgentUtils.extractBrowser(userAgent);
+        String device = UserAgentUtils.extractDevice(userAgent);
+
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
 
@@ -411,8 +460,14 @@ public class UserService {
         // Update User login metadata
         user.setRememberMeEnabled(request.isRememberMe());
         user.setLastLogin(LocalDateTime.now());
+        user.setLastLoginIp(ipAddress);
+        user.setLastLoginDevice(device);
+        user.setLastLoginBrowser(browser);
         user.setLoginMethod("OTP");
         userRepository.save(user);
+
+        LoginHistory history = new LoginHistory(user.getId(), user.getEmail(), ipAddress, device, browser, "OTP", "SUCCESS", userAgent);
+        loginHistoryRepository.save(history);
 
         // Generate Access & Refresh tokens
         String token = jwtService.generateToken(user.getEmail(), user.getRole());
@@ -423,7 +478,11 @@ public class UserService {
         RefreshToken refreshToken = new RefreshToken(
                 refreshTokenStr,
                 user.getEmail(),
-                LocalDateTime.now().plusDays(expiryDays)
+                LocalDateTime.now().plusDays(expiryDays),
+                device,
+                browser,
+                ipAddress,
+                request.isRememberMe()
         );
         refreshTokenRepository.save(refreshToken);
 
@@ -435,6 +494,50 @@ public class UserService {
                 user.getFullName(),
                 user.getEmail()
         );
+    }
+
+    public List<ActiveSessionDTO> getActiveSessions(String email, String currentRefreshToken) {
+        return refreshTokenRepository.findAll().stream()
+                .filter(rt -> email.equalsIgnoreCase(rt.getEmail()) && !rt.isRevoked() && rt.getExpiresAt().isAfter(LocalDateTime.now()))
+                .map(rt -> new ActiveSessionDTO(
+                        rt.getId(),
+                        rt.getDevice() != null ? rt.getDevice() : "Desktop Device",
+                        rt.getBrowser() != null ? rt.getBrowser() : "Standard Browser",
+                        rt.getOs() != null ? rt.getOs() : "Unknown OS",
+                        rt.getLocation() != null ? rt.getLocation() : "Local Network",
+                        rt.getIpAddress() != null ? rt.getIpAddress() : "127.0.0.1",
+                        rt.getCreatedAt() != null ? rt.getCreatedAt() : LocalDateTime.now(),
+                        rt.getExpiresAt(),
+                        currentRefreshToken != null && currentRefreshToken.equals(rt.getToken()),
+                        rt.isRememberMe()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public void revokeSession(String email, String sessionId) {
+        refreshTokenRepository.findById(sessionId)
+                .ifPresent(token -> {
+                    if (email.equalsIgnoreCase(token.getEmail())) {
+                        refreshTokenRepository.delete(token);
+                    }
+                });
+    }
+
+    public void revokeAllSessions(String email) {
+        refreshTokenRepository.deleteByEmail(email);
+    }
+
+    public void revokeAllOtherSessions(String email, String currentRefreshToken) {
+        List<RefreshToken> userTokens = refreshTokenRepository.findByEmail(email);
+        for (RefreshToken rt : userTokens) {
+            if (!rt.getToken().equals(currentRefreshToken)) {
+                refreshTokenRepository.delete(rt);
+            }
+        }
+    }
+
+    public List<LoginHistory> getLoginHistory(String email) {
+        return loginHistoryRepository.findTop20ByEmailOrderByLoginTimeDesc(email);
     }
 
     public void resetPassword(String token, String newPassword) {

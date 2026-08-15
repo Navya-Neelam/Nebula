@@ -22,6 +22,8 @@ public class RefreshToken {
     private LocalDateTime createdAt;
     private String device;
     private String browser;
+    private String os;
+    private String location;
     private String ipAddress;
     private boolean rememberMe;
     private boolean revoked = false;
@@ -39,16 +41,22 @@ public class RefreshToken {
         this.revoked = false;
     }
 
-    public RefreshToken(String token, String email, LocalDateTime expiresAt, String device, String browser, String ipAddress, boolean rememberMe) {
+    public RefreshToken(String token, String email, LocalDateTime expiresAt, String device, String browser, String os, String location, String ipAddress, boolean rememberMe) {
         this.token = token;
         this.email = email;
         this.expiresAt = expiresAt;
         this.createdAt = LocalDateTime.now();
         this.device = device;
         this.browser = browser;
+        this.os = os;
+        this.location = location;
         this.ipAddress = ipAddress;
         this.rememberMe = rememberMe;
         this.revoked = false;
+    }
+
+    public RefreshToken(String token, String email, LocalDateTime expiresAt, String device, String browser, String ipAddress, boolean rememberMe) {
+        this(token, email, expiresAt, device, browser, "Unknown OS", "Local Network", ipAddress, rememberMe);
     }
 
     public String getId() {
@@ -105,6 +113,22 @@ public class RefreshToken {
 
     public void setBrowser(String browser) {
         this.browser = browser;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getIpAddress() {

@@ -637,6 +637,12 @@
       @if (authService.currentUser(); as user) {
         <span class="welcome-text">Welcome back, <strong>{{ user.fullName }}</strong>!</span>
       }
+      <a routerLink="/login-history" style="color: #38bdf8; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.2);">
+        <i class="bi bi-shield-lock"></i> Sessions
+      </a>
+      <a routerLink="/profile" style="color: #e2e8f0; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <i class="bi bi-person"></i> Profile
+      </a>
       <button (click)="logout()" class="logout-btn">Logout</button>
     </div>
   </header>
