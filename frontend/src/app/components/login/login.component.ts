@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -10,10 +10,49 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['token']) {
+        const token = params['token'];
+        const refreshToken = params['refreshToken'] || '';
+        const role = params['role'] || 'STUDENT';
+        const id = params['id'] || '';
+        const fullName = params['fullName'] || '';
+        const email = params['email'] || '';
+
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('refreshToken', refreshToken);
+        const user = {
+          id,
+          fullName,
+          email,
+          createdAt: '',
+          role: role as any,
+          isVerified: true,
+          isActive: true
+        };
+        sessionStorage.setItem('user', JSON.stringify(user));
+        this.authService.currentUser.set(user);
+        this.router.navigate(['/dashboard']);
+      } else if (params['error']) {
+        this.errorMessage.set(params['error']);
+      }
+    });
+  }
+
+  loginWithGoogle() {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  }
+
+  loginWithGitHub() {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/github';
+  }
 
   loginTab = signal<'password' | 'otp'>('password');
 

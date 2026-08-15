@@ -4,31 +4,48 @@ server:
 spring:
   profiles:
     active: local
+
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/nebula}
       database: nebula
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id-placeholder}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret-placeholder}
+            scope:
+              - email
+              - profile
+          github:
+            client-id: ${GITHUB_CLIENT_ID:github-client-id-placeholder}
+            client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret-placeholder}
+            scope:
+              - user:email
+              - read:user
 
   mail:
     host: ${SMTP_HOST:smtp.gmail.com}
     port: ${SMTP_PORT:587}
-    username: ${SMTP_USER}
-    password: ${SMTP_PASS}
+    username: ${SMTP_USER:your-email@gmail.com}
+    password: ${SMTP_PASS:your-app-password}
     properties:
       mail:
         debug: true
         smtp:
-          auth: ${SMTP_AUTH:true}
+          auth: true
           starttls:
-            enable: ${SMTP_STARTTLS:true}
+            enable: true
           ssl:
-            trust: ${SMTP_SSL_TRUST:smtp.gmail.com}
+            trust: smtp.gmail.com
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: 900000 # 15 minutes
+    secret: ${JWT_SECRET:bmVidWxhLWF1dGgtZGV2ZWxvcG1lbnQtc2VjcmV0LWtleS0yMDI2LXZlcnktbG9uZw==}
+    expiration-ms: 900000
 
-# default from address
 mail-defaults:
-  from: ${MAIL_FROM}
+  from: ${MAIL_FROM:your-email@gmail.com}

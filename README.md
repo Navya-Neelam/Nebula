@@ -1,41 +1,61 @@
-# Nebula Auth
+# Nebula Auth & Learning Platform
 
-A production-style authentication system built using Java Spring Boot and Angular. The application provides secure user registration, login, JWT-based authentication, password encryption using BCrypt, and MongoDB integration with a modern Angular frontend.
+A full-stack enterprise authentication and course management system built with **Java Spring Boot 3** and **Angular 19**. Features role-based access control (RBAC), multi-factor OTP login, active session management, login history auditing, social OAuth2 authentication (Google & GitHub), and course management.
 
-This project demonstrates backend development skills including REST APIs, Spring Security, JWT, MongoDB, and frontend integration.
+---
 
 ## Tech Stack
 
-- **Backend**: Java 17, Spring Boot 3.3.0, Spring Web, Spring Security (stateless sessions), Spring Data MongoDB, JJWT (JSON Web Tokens)
-- **Frontend**: Angular (v18+), Standalone Components, Angular Router, Reactive Forms with validations
-- **Database**: MongoDB (connection via URI)
-- **Authentication**: JWT-based, passwords hashed with BCrypt
+- **Backend**: Java 17, Spring Boot 3.3.0, Spring Security 6 (Stateless JWT & OAuth2 Client), Spring Data MongoDB, JJWT (JSON Web Tokens)
+- **Frontend**: Angular 19, Standalone Components, Angular Signals, Reactive Forms, Glassmorphism UI Design System
+- **Database**: MongoDB (Cloud Atlas / Local)
+- **Security & Auth**: BCrypt Password Hashing, JWT Bearer Authentication, Refresh Tokens, Google & GitHub OAuth2 Login, Multi-Session Tracking
 
 ---
-## Architecture 
 
-Angular Client
-      │
-      ▼
-REST APIs
-      │
-      ▼
-Spring Boot
-      │
-Spring Security
-      │
-JWT Authentication
-      │
-MongoDB
+## System Architecture
+
+```text
+               Angular 19 Frontend (Port 4200)
+                              │
+                              ▼
+            Spring Boot REST APIs & OAuth2 (Port 8080)
+                              │
+             ┌────────────────┴────────────────┐
+             ▼                                 ▼
+   Spring Security & JWT             OAuth2 Client
+   (BCrypt / Stateless)            (Google & GitHub)
+             │                                 │
+             └────────────────┬────────────────┘
+                              ▼
+                    MongoDB Database Cluster
+```
+
+---
 
 ## Project Structure
 
 ```text
-nebula-auth/
-├── backend/         # Spring Boot maven project (includes Maven wrapper)
-├── frontend/        # Angular standalone client application
-├── .gitignore       # Root Git ignore rules
-└── README.md        # This file
+Nebula/
+├── backend/                  # Spring Boot Maven Project
+│   ├── src/main/java/com/nebula/auth/
+│   │   ├── config/           # SecurityConfig & App Configs
+│   │   ├── controller/       # AuthController, LoginController, CourseController, etc.
+│   │   ├── dto/              # ActiveSessionDTO, AuthResponse, Request DTOs
+│   │   ├── model/            # User, RefreshToken, LoginHistory, Course, etc.
+│   │   ├── repository/       # MongoRepositories
+│   │   ├── security/         # JwtAuthFilter, OAuth2SuccessHandler, JwtService
+│   │   ├── service/          # UserService, EmailService, CourseService
+│   │   └── util/             # UserAgentUtils (Device/Browser/OS/IP)
+│   └── src/main/resources/
+│       └── application.yml   # App configuration & OAuth2 client properties
+├── frontend/                 # Angular 19 Client
+│   └── src/app/
+│       ├── components/       # Login, Register, LoginHistory, Dashboard, Profile, etc.
+│       ├── guards/           # Functional Route Guards (authGuard, roleGuard)
+│       ├── interceptors/     # AuthInterceptor (JWT Bearer attachment)
+│       └── services/         # AuthService, CourseService, PreferencesService
+└── README.md
 ```
 
 ---
@@ -44,73 +64,64 @@ nebula-auth/
 
 ### 1. Prerequisites
 
-Ensure you have the following installed on your machine:
-- **Java Development Kit (JDK) 17** (or 21)
-- **Node.js** (v18 or higher, including npm)
-- **MongoDB** (a running local instance or a MongoDB Atlas cloud database URI)
+- **Java JDK 17+**
+- **Node.js 18+** & npm
+- **MongoDB Atlas Connection URI** or local MongoDB
 
 ---
 
-### 2. Running the Backend
+### 2. Running the Backend (Spring Boot)
 
-The backend utilizes the **Maven Wrapper**, meaning you do not need Maven installed globally.
+Navigate to `backend/`:
 
-1. Navigate to the `backend/` directory.
-2. Define the required environment variables:
-   - `MONGODB_URI`: The connection URI to your MongoDB instance (defaults to `mongodb://localhost:27017/nebula-auth`).
-   - `JWT_SECRET`: A 256-bit (or stronger) Base64 encoded signing secret (a secure fallback is configured for local development).
-3. Run the Spring Boot application using the wrapper command:
-
-**On Windows (PowerShell/CMD):**
 ```powershell
-# Optional: Set custom MongoDB connection URI
-$env:MONGODB_URI="your-mongodb-atlas-uri"
-
-# Run the app
+# Windows
 .\mvnw.cmd spring-boot:run
 ```
 
-**On Linux / macOS:**
 ```bash
-# Optional: Set custom MongoDB connection URI
-export MONGODB_URI="your-mongodb-atlas-uri"
-
-# Run the app
+# Linux / macOS
 ./mvnw spring-boot:run
 ```
 
-The server will start on [http://localhost:8080](http://localhost:8080).
+The Spring Boot backend will start on **`http://localhost:8080`**.
+
+> **OAuth2 Credentials (Optional)**:
+> Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET` environment variables or configure them directly in `application.yml`.
 
 ---
 
-### 3. Running the Frontend
+### 3. Running the Frontend (Angular 19)
 
-The frontend uses Angular standalone components.
-
-1. Navigate to the `frontend/` directory.
-2. Build and start the development server using Node/NPM:
+Navigate to `frontend/`:
 
 ```bash
-# Install dependencies (already installed during scaffolding, but useful if cloning fresh)
 npm install
-
-# Start the Angular development server
 npm run start
 ```
 
-The frontend application will compile and be served on [http://localhost:4200](http://localhost:4200).
+The Angular app will start on **`http://localhost:4200`**.
 
 ---
 
-## Features Implemented
+## Key Features & Endpoints
 
-### Backend REST API
-- `POST /api/auth/register` — Standard JSON request validation. Hashes password using BCrypt, checks for duplicate email conflicts (returns `409 Conflict`), persists User to MongoDB, and returns JWT.
-- `POST /api/auth/login` — Verifies email/password against stored BCrypt hash and returns JWT.
-- `GET /api/auth/me` — Protected endpoint. Extracts and verifies the bearer token from the `Authorization` header, returns user info.
+### 🔐 Authentication & Social Logins
+- `POST /api/auth/register` — Account registration with role assignment and validation.
+- `POST /api/auth/login` — Password login returning JWT and Refresh Token.
+- `POST /api/auth/send-login-otp` — Generate and email 6-digit verification OTP code.
+- `POST /api/auth/verify-login-otp` — Login via verified 6-digit OTP code.
+- `GET /oauth2/authorization/google` — Initiate Google OAuth2 login flow.
+- `GET /oauth2/authorization/github` — Initiate GitHub OAuth2 login flow.
 
-### Frontend Features
-- **Visuals**: Modern Glassmorphism forms card, floating aurora gradient blobs, responsive layout.
-- **Validations**: Inline reactive form validations (email format, matching password checks, password strength constraints).
-- **Session**: Retains session state via `sessionStorage` token and loads user profile on reload.
-- **Interceptors & Guards**: Seamless functional JWT HTTP interceptor and functional route guard protection.
+### 🛡️ Login History & Session Management
+- `GET /api/login/history` — Audit trail of user login attempts (Device, OS, Browser, IP, Location, Method, Timestamp).
+- `GET /api/login/current-session` — Retrieve active sessions with `Current Session` badge indicators.
+- `DELETE /api/login/session/{id}` — Revoke individual device session.
+- `DELETE /api/login/logout-all` — Revoke all active sessions across devices.
+
+### 👤 Profile & Admin Controls
+- `GET /api/auth/me` — Retrieve logged-in user profile.
+- `PUT /api/auth/profile` — Update user profile details.
+- `PUT /api/auth/change-password` — Password modification.
+- `GET /api/auth/users` — Admin user management (Role filtering & Status toggle).

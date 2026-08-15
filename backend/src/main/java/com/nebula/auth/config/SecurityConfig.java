@@ -1,6 +1,7 @@
 package com.nebula.auth.config;
 
 import com.nebula.auth.security.JwtAuthenticationFilter;
+import com.nebula.auth.security.OAuth2SuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -27,9 +28,11 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthFilter, OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
     @Bean
@@ -48,9 +51,14 @@ public class SecurityConfig {
                     "/api/auth/reset-password",
                     "/api/auth/verify",
                     "/api/auth/refresh-token",
-                    "/api/auth/logout"
+                    "/api/auth/logout",
+                    "/oauth2/**",
+                    "/login/oauth2/**"
                 ).permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oAuth2SuccessHandler)
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
